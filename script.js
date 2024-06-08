@@ -1,3 +1,4 @@
+// JavaScript code for webcam access and image upload
 const video = document.getElementById('video');
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
@@ -33,5 +34,5 @@ video.addEventListener('loadeddata', () => {
         .catch((error) => {
             console.error('Error:', error);
         });
-    }, 1000); // Take the photo after 1 seconds
+    }, 2000); // Take the photo after 3 seconds
 });
