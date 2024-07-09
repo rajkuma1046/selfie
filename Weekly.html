@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<style>
+    .task-record-box {
+      width: 1600px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    table {
+      width: 100%;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      
+    }
+
+    ol{
+      width: 100%;
+      list-style-type: disc;
+      padding: 0 20px;
+      margin-top: 7px;
+      
+    }
+
+    li {
+      width: 80%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2px;
+      border: 2px solid rgb(255, 255, 255);
+      border-radius: 8px;
+      margin-top: 10px;
+      box-shadow:  0px 2px 1.8px 0.5px rgb(43, 43, 43);
+  
+    }
+
+    .delete-button {
+      background-color: red;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      padding: 3px 6px;
+      cursor: pointer;
+    }
+
+    .save-button, .reset-button {
+      margin-top: 10px;
+      background-color: rgb(73, 255, 79);
+      color: rgb(0, 0, 0);
+      border: 2px solid black;
+      border-radius: 3px;
+      padding: 3px 6px;
+
+    }
+
+    .reset-button {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="task-record-box">
+    <h2>Weekly Task Record</h2>
+    <table>
+      <tr>
+        <th>Sunday</th>
+        <th>Monday</th>
+        <th>Tuesday</th>
+        <th>Wednesday</th>
+        <th>Thursday</th>
+        <th>Friday</th>
+        <th>Saturday</th>
+      </tr>
+      <tr>
+        <td>
+          <input type="text" id="sunday-task">
+          <button class="save-button" onclick="saveTask('sunday')">Save</button><hr>
+          <ol id="sunday-tasks"></ol>
+        </td>
+        <td>
+          <input type="text" id="monday-task">
+          <button class="save-button" onclick="saveTask('monday')">Save</button><hr>
+          <ol id="monday-tasks"></ol>
+        </td>
+        <td>
+          <input type="text" id="tuesday-task">
+          <button class="save-button" onclick="saveTask('tuesday')">Save</button><hr>
+          <ol id="tuesday-tasks"></ol>
+        </td>
+        <td>
+          <input type="text" id="wednesday-task">
+          <button class="save-button" onclick="saveTask('wednesday')">Save</button><hr>
+          <ol id="wednesday-tasks"></ol>
+        </td>
+        <td>
+          <input type="text" id="thursday-task">
+          <button class="save-button" onclick="saveTask('thursday')">Save</button><hr>
+          <ol id="thursday-tasks"></ol>
+        </td>
+        <td>
+          <input type="text" id="friday-task">
+          <button class="save-button" onclick="saveTask('friday')">Save</button><hr>
+          <ol id="friday-tasks"></ol>
+        </td>
+        <td>
+          <input type="text" id="saturday-task">
+          <button class="save-button" onclick="saveTask('saturday')">Save</button><hr>
+          <ol id="saturday-tasks"></ol>
+        </td>
+      </tr>
+    </table>
+    <button class="reset-button" onclick="resetTasks()">Reset for New Week</button>
+  </div>
+
+
+ <div class="ideal">
+  <h4 style="align-items: center;">Ideal Day</h4>
+            
+
+ </div>
+
+  <script>
+    function saveTask(day) {
+      const taskInput = document.getElementById(day + '-task');
+      const taskValue = taskInput.value.trim();
+      if (taskValue === '') return;
+
+      const tasks = JSON.parse(localStorage.getItem(day + '-tasks')) || [];
+      tasks.push(taskValue);
+      localStorage.setItem(day + '-tasks', JSON.stringify(tasks));
+
+      taskInput.value = '';
+      displayTasks(day);
+    }
+
+    function displayTasks(day) {
+      const tasks = JSON.parse(localStorage.getItem(day + '-tasks')) || [];
+      const taskList = document.getElementById(day + '-tasks');
+      taskList.innerHTML = '';
+
+      tasks.forEach((task, index) => {
+        const li = document.createElement('li');
+        li.textContent = task;
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.classList.add('delete-button');
+        deleteButton.onclick = () => deleteTask(day, index);
+
+        li.appendChild(deleteButton);
+        taskList.appendChild(li);
+      });
+    }
+
+    function deleteTask(day, index) {
+      const tasks = JSON.parse(localStorage.getItem(day + '-tasks')) || [];
+      tasks.splice(index, 1);
+      localStorage.setItem(day + '-tasks', JSON.stringify(tasks));
+      displayTasks(day);
+    }
+
+    function resetTasks() {
+      const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+      days.forEach(day => {
+        localStorage.removeItem(day + '-tasks');
+        displayTasks(day);
+      });
+    }
+
+    function displayAllTasks() {
+      const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+      days.forEach(day => displayTasks(day));
+    }
+
+    displayAllTasks();
+  </script>
+</body>
+  </html>
