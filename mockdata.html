@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mock Test Marks Analysis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .chart-container {
+            width: 80%;
+            margin-top: 20px;
+            display: flex;
+        
+        }
+        canvas {
+            width: 100% !important;
+            max-width: 800px;
+            height: auto !important;
+            border-radius: 10px;
+            box-shadow: 1.5px 1px 4px 1px rgb(78, 78, 79);
+        }
+        .input-container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .input-container input {
+            margin: 5px;
+            margin-left: 60px;
+            font-size: medium;
+            box-shadow: .5px 1px 8px 1px rgb(159, 159, 159);
+            color: brown;
+            padding: 5px;
+            height: 20px;
+            font-weight: bolder;
+            border-radius: 10px;
+
+
+
+        }
+        .input-container button{
+            margin: 10px;
+            display: flex;
+            flex-direction: row;
+            padding: 5px;
+            box-shadow: .5px 0.3px 15px 0.5px rgb(90, 87, 87);
+            border-radius: 5px;
+            color: antiquewhite;
+            background-color: rgb(39, 9, 74);
+
+        }
+        #tier1Average{
+              
+            padding: 5px;
+            box-shadow: .5px 0.3px 15px 0.5px rgb(90, 87, 87);
+            border-radius: 5px;
+            color: antiquewhite;
+            background-color: rgb(174, 8, 8);
+        }
+
+
+        #tier2Average{
+
+            padding: 5px;
+            box-shadow: .5px 0.3px 15px 0.5px rgb(90, 87, 87);
+            border-radius: 5px;
+            color: antiquewhite;
+            background-color: rgb(0, 0, 128);
+}
+    </style>
+
+<script defer src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js"></script>
+<!-- Add Firebase SDK for Firebase Realtime Database -->
+<script defer src="https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js"></script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+    // Import other Firebase services as needed
+    // import { database } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+
+    // Your Firebase configuration
+    const firebaseConfig = {
+  apiKey: "AIzaSyA8gTB1KZpprvPmyezc5oNIm1ArKyiXbR0",
+  authDomain: "mock-data-6f307.firebaseapp.com",
+  databaseURL: "https://mock-data-6f307-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "mock-data-6f307",
+  storageBucket: "mock-data-6f307.appspot.com",
+  messagingSenderId: "38700675572",
+  appId: "1:38700675572:web:24fce0e53c91066e2489a1"
+};
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+  </script>
+
+</head>
+<body>
+    <h1>Mock Test Marks Analysis</h1>
+    <div class="chart-container">
+        <h2>Tier 1 Mock Test (Total Marks: 200)</h2>
+        <canvas id="tier1Chart"></canvas>
+        <div class="input-container">
+            <h3>Tier 1</h3>
+            <label for="tier1Marks">Tier 1 Marks:</label>
+            <input type="number" id="tier1Marks" max="200">
+            <button onclick="saveTier1Marks()">Save Tier 1 Marks</button>
+            <button onclick="resetTier1Data()">Reset Tier 1 Data</button>
+            <h3 id="tier1Average">Average Marks: 0</h3>
+        </div>
+    </div>
+    <div class="chart-container">
+        <h2>Tier 2 Mock Test (Total Marks: 390)</h2>
+        <canvas id="tier2Chart"></canvas>
+        <div class="input-container">
+            <h3>Tier 2</h3>
+            <label for="tier2Marks">Tier 2 Marks:</label>
+            <input type="number" id="tier2Marks" max="390">
+            <button onclick="saveTier2Marks()">Save Tier 2 Marks</button>
+            <button onclick="resetTier2Data()">Reset Tier 2 Data</button>
+            <h3 id="tier2Average">Average Marks: 0</h3>
+        </div>
+    </div>
+
+
+
+
+
+
+    
+    <script type="module">
+        // Import the functions you need from the SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+    
+        const firebaseConfig = {
+  apiKey: "AIzaSyA8gTB1KZpprvPmyezc5oNIm1ArKyiXbR0",
+  authDomain: "mock-data-6f307.firebaseapp.com",
+  databaseURL: "https://mock-data-6f307-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "mock-data-6f307",
+  storageBucket: "mock-data-6f307.appspot.com",
+  messagingSenderId: "38700675572",
+  appId: "1:38700675572:web:24fce0e53c91066e2489a1"
+};
+    
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+    
+        // Function to save localStorage data to Firebase
+        function saveDataToFirebase() {
+            const tier1Data = JSON.parse(localStorage.getItem('tier1Data')) || [];
+            const tier2Data = JSON.parse(localStorage.getItem('tier2Data')) || [];
+    
+            // Set data in Firebase under 'tier1Data' and 'tier2Data' paths
+            set(ref(database, 'tier1Data'), tier1Data);
+            set(ref(database, 'tier2Data'), tier2Data);
+    
+            console.log('Data saved to Firebase Realtime Database.');
+        }
+    
+        // Call save function wherever needed
+        saveDataToFirebase();
+    </script>
+    
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const tier1Data = JSON.parse(localStorage.getItem('tier1Data')) || [];
+        const tier2Data = JSON.parse(localStorage.getItem('tier2Data')) || [];
+
+        let tier1Chart, tier2Chart;
+
+        function saveTier1Marks() {
+            const tier1Marks = document.getElementById('tier1Marks').value;
+            const date = new Date().toISOString().split('T')[0];
+
+            if (tier1Marks !== "") {
+                tier1Data.push({ date, marks: parseInt(tier1Marks) });
+                localStorage.setItem('tier1Data', JSON.stringify(tier1Data));
+            }
+
+            renderTier1Chart();
+            updateTier1Average();
+        }
+
+        function saveTier2Marks() {
+            const tier2Marks = document.getElementById('tier2Marks').value;
+            const date = new Date().toISOString().split('T')[0];
+
+            if (tier2Marks !== "") {
+                tier2Data.push({ date, marks: parseInt(tier2Marks) });
+                localStorage.setItem('tier2Data', JSON.stringify(tier2Data));
+            }
+
+            renderTier2Chart();
+            updateTier2Average();
+        }
+
+        function resetTier1Data() {
+            localStorage.removeItem('tier1Data');
+            location.reload();
+        }
+
+        function resetTier2Data() {
+            localStorage.removeItem('tier2Data');
+            location.reload();
+        }
+
+        function renderTier1Chart() {
+            const ctx1 = document.getElementById('tier1Chart').getContext('2d');
+
+            if (tier1Chart) {
+                tier1Chart.destroy();
+            }
+
+            const tier1Labels = tier1Data.map(entry => entry.date);
+            const tier1Marks = tier1Data.map(entry => entry.marks);
+
+            console.log('Tier 1 Labels:', tier1Labels);
+            console.log('Tier 1 Marks:', tier1Marks);
+
+            tier1Chart = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: tier1Labels,
+                    datasets: [{
+                        label: 'Tier 1 Marks',
+                        data: tier1Marks,
+                        borderColor: 'rgba(174, 8, 8)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Marks'
+                            },
+                            max: 200
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderTier2Chart() {
+            const ctx2 = document.getElementById('tier2Chart').getContext('2d');
+
+            if (tier2Chart) {
+                tier2Chart.destroy();
+            }
+
+            const tier2Labels = tier2Data.map(entry => entry.date);
+            const tier2Marks = tier2Data.map(entry => entry.marks);
+
+            console.log('Tier 2 Labels:', tier2Labels);
+            console.log('Tier 2 Marks:', tier2Marks);
+
+            tier2Chart = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: tier2Labels,
+                    datasets: [{
+                        label: 'Tier 2 Marks',
+                        data: tier2Marks,
+                        borderColor: 'rgba(0, 0, 128)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Marks'
+                            },
+                            max: 390
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateTier1Average() {
+            const totalMarks = tier1Data.reduce((sum, entry) => sum + entry.marks, 0);
+            const averageMarks = tier1Data.length ? (totalMarks / tier1Data.length).toFixed(2) : 0;
+            document.getElementById('tier1Average').innerText = `Average Marks: ${averageMarks}`;
+        }
+
+        function updateTier2Average() {
+            const totalMarks = tier2Data.reduce((sum, entry) => sum + entry.marks, 0);
+            const averageMarks = tier2Data.length ? (totalMarks / tier2Data.length).toFixed(2) : 0;
+            document.getElementById('tier2Average').innerText = `Average Marks: ${averageMarks}`;
+        }
+
+        renderTier1Chart();
+        renderTier2Chart();
+        updateTier1Average();
+        updateTier2Average();
+    </script>
+</body>
+</html>
