@@ -111,7 +111,7 @@ li {
         }
     
         function scheduleNotification(fact) {
-            const notificationTime = fact.nextReview + fact.interval * 24 * 60 * 60 * 1000;
+            const notificationTime = fact.nextReview + fact.interval * 60 * 1000;
             setTimeout(() => {
                 new Notification('Time to review!', {
                     body: fact.text
