@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spaced Repetition Memorization</title>
+
+<Style>body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input, button {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    background-color: #f9f9f9;
+    margin: 5px 0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+</Style>
+</head>
+<body>
+    <div class="container">
+        <h1>Spaced Repetition Memorization</h1>
+        <form id="fact-form">
+            <input type="text" id="fact" placeholder="Enter a fact" required>
+            <button type="submit">Add Fact</button>
+        </form>
+        <ul id="fact-list"></ul>
+    </div>
+    <script src="script.js">document.addEventListener('DOMContentLoaded', () => {
+        const factForm = document.getElementById('fact-form');
+        const factInput = document.getElementById('fact');
+        const factList = document.getElementById('fact-list');
+        const facts = JSON.parse(localStorage.getItem('facts')) || [];
+    
+        factForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const fact = factInput.value.trim();
+            if (fact) {
+                addFact(fact);
+                factInput.value = '';
+            }
+        });
+    
+        function addFact(fact) {
+            const newFact = {
+                text: fact,
+                nextReview: Date.now(),
+                interval: 1
+            };
+            facts.push(newFact);
+            localStorage.setItem('facts', JSON.stringify(facts));
+            renderFacts();
+            scheduleNotification(newFact);
+        }
+    
+        function renderFacts() {
+            factList.innerHTML = '';
+            facts.forEach(fact => {
+                const li = document.createElement('li');
+                li.textContent = fact.text;
+                factList.appendChild(li);
+            });
+        }
+    
+        function scheduleNotification(fact) {
+            const notificationTime = fact.nextReview + fact.interval * 24 * 60 * 60 * 1000;
+            setTimeout(() => {
+                new Notification('Time to review!', {
+                    body: fact.text
+                });
+                fact.nextReview = Date.now();
+                fact.interval *= 2;
+                localStorage.setItem('facts', JSON.stringify(facts));
+                scheduleNotification(fact);
+            }, notificationTime - Date.now());
+        }
+    
+        function initNotifications() {
+            if (Notification.permission !== 'granted') {
+                Notification.requestPermission();
+            }
+            facts.forEach(fact => {
+                if (fact.nextReview <= Date.now()) {
+                    scheduleNotification(fact);
+                } else {
+                    const delay = fact.nextReview - Date.now();
+                    setTimeout(() => scheduleNotification(fact), delay);
+                }
+            });
+        }
+    
+        renderFacts();
+        initNotifications();
+    });
+    </script>
+</body>
+</html>
