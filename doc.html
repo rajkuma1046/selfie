@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Documents</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            display: none; /* Initially hide the container */
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        input[type="password"], button {
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 60%;
+            max-width: 300px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .boxes-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+       div .box{
+             
+            width: 100%;
+            height: 200px;
+            background-color: #ddd;
+            border-radius: 8px;
+         
+            overflow: hidden;
+            box-shadow: 0 4px 8px grey;
+            cursor: pointer;
+        }
+
+        .box a {
+            display: block;
+            width: 100%;
+            height: 100%;
+            text-decoration: none;
+        }
+
+        .box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body onload="promptForPasskey()">
+
+
+
+    <div class="container" id="documentPortal">
+        <h3>Welcome to RAJ's Document Download Portal</h3>
+      
+        <div id="boxes" class="boxes-container">
+            <!-- Static boxes with individual links -->
+            <div class="box">
+                <a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhad8R5XPGD_kigpFAi3pS581FyZBrW7Ektd9Ad8ED-kU_A0hM-5RZu5u-FqsbZawQPMVpHZY5Fed7SDi-T-Z0My2byIBJwnPr3VkhOK2cpI5BnjKV9EQYkZxaQzupwBxs8AjQkdUvLHCultrIt6my18IrSAr93BR-sRCM9BSi77i2Ccgb8NcIuOVF5PVg/s1529/adhare%20under%20100KB%20.jpg">
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEilflpslSDhNZotpUDC7iNtehoTCwcjV2jNHl5fqZEfJyJn3gwF-zKrXXjoqjaxNARoYcyQjCThWFdippQB0R6KSOmD7a9nJvYEYP5aHL-fAX9M3XSotygfV7MkA_ktgsYliDk1km1ryV9VhTIp3_ZnYQQq7Kn99OvIKnR88zTEgNXIVgeQON5MzngVd5A/s700/medium_aadhaar_card_0ae45bd73d.webp" alt="adhaar">
+                </a>
+            </div>
+            <div class="box">
+                <a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhf1MhDc1A16Rm6IgMTTljkRCZUygFVANqUzsNpMk35UxRbFQpHtUSEBIH5yIjkXDOGPBNZdtADd-4XpxsmFE_pc88mvTRsDV-5VqbGLsVbRjLrTtG6HXtY3yW64mW50CFwjyNKf-INZuIDyN8jMqqrJzfVa2vG2eLP1Gp-hE1gkWGCebLaITVtsbSzBeo/s1080/3_1.jpg">
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhpHIrDNavaaWwELz2mS1wJHps9ztocUlOzKw3d9VyXaGHxoNUPd7WSqV8EjkDhe1jWXAM7TXLabQ8SF6OtD57zkKM0w9htSlMK38xrHjNXZjsz1CIFSL1zZIKcXxKx9Vl5VA8-LyXLVCuLG3qPpuzVKDNXD3u3YPcO-arSACAzIVDbYh1xFLkNfq3PZ9Q/s400/PAN-Card-Correction.jpg" alt="pan">
+                </a>
+            </div>
+            <div class="box">
+                <a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgm-JMrcm9_oK_9BX9dFb3S2w0R7RDdslp2EqhZr0bYI5vFnJaAnU66MT_LIUIMEoRdpnASxdp4E0Oc4s0gwV3B78KYix5ZvhuVunCxSGf_tSipbircR8oeY0_4jVtUh2mOdYb0JMvjuMXVoCQ5IMW9woUBtmuQBcyuKb66W_wv92ggbLokkbaK5BGsmpU/s1482/3_1%282%29.jpg">
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgCr6RGnKG4_1GzaIfyhdQI2PUEF_d_F6ahJm6MtLp8aGZe3FHptOPBZCZebejtUhnNfgYeTjvcatoIfa_avSuY1Scs_NHQMddu0XsH4Y_Xp3CTCEcfJye5DAWuExHv_dWsVrn6jiOaLCVP8ES-500qlrhDeVWNFBNgzfGXz3U-sPlTZlnE5qj7I4EyrCQ/s1280/East-Godavari-Overview-73.png" alt="voter">
+                </a>
+            </div>
+            <div class="box">
+                <a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjXjM8i3LXgAQwkBzLkL_jvccUEX3asAiaXRiCkGd7c7_zQb6Q2163xiQ0O9tvjRjb_1uV-wO9cbErhSiVykmshG0lgwyeSB29bk0qDQ1x5BEYgMGWzP7t9phNFPKfbgNgwkW1HtqT5KlNMjeMK0JZaBJ52XyGN6RYjAP9I45o2cZimdMfddGuDuCp-cOk/s4000/Navy%20X%20.jpg">
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgrHSPVV6nnPEBNmpSG2GqpbdRbMCWtY1H0Rkj8grsfOcM_U9d64KWt1uOS4_0CsGkM-4rWI0r4wrXS1BSwrAJFobA-PlSW1J5zwKL2XMqQajUwU8LO3-kPwTjB71Y6OGAGqMJh2BIjBGCAxtJuBxw8pNauZN4LNfyAZ3CLPSJ7a-uN9HvmNjQgSMu2By4/s673/MP10tha_b_120517.jpg" alt="10th">
+                </a>
+            </div>
+            <div class="box">
+                <a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjusXmZefs8j-VFPUNlXKrs-nGuc2V9-_eXwb-Oomtm-ekxxQ4MVg_CMSHTHKR5qUGKuQYQcxDY6Z-bqgcUcspbRhOpA7Vse1mMxApAwrlPRt7jRi0MGldfvSfBYfLrOaovrf8KskzVSK8I36hwR5HQnk2u0Z4TVVtIlQJVoKCDWC26O5P5Zt4S3N_YDj0/s4000/navy%20XII.jpg">
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhQBFict3ki8rjWJLq3HcSUqtcOSaqlhN-sjgxF_mUyzwOk2do1KjKyNampBC28HHUmKmH91iatyG84BeNRYX95bCbHthbT1oBzEDx-k2dv7tz6qbJLfUIZPRM7kYO7rVKUAsHOt8TTO20JCOIgR005MG2A7NQ-Wm_lbWQjoV0Qk4ltoIE3xjsC2ORzo9s/s1200/MP-Board-MPBSE-12th-Result-2021-Declared.jpg" alt="12th">
+                </a>
+            </div>
+            <div class="box">
+                <a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhErUFUq0kT10vS6p03xfd82zjNqwgTNaeq3XQqYvOyOu1Mx9kzdE66bJbrkPvDFppIatvYo4Rgpk-8pwjzeIwK90iMjcoKD7pSbRQBX_V4aslRr4LdanhrmwdhBIQP2SESIhK2bBR71qt7Z6nFE0ht6Ra-6Q_MBNwljDjH0_8vvxixg3vl1DdI6QiYVEk/s1757/OBC%20hindi%20.jpg">
+                    <img src="https://i0.wp.com/www.wbgov.org/wp-content/uploads/2022/07/mp-caste-certificate-download-online.jpg?ssl=1" alt="obc">
+                </a>
+            </div>
+            <div class="box">
+                <a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgX3eON6La-F7SoKQc5Md3Yi52Jy8c3RF0eYwECvzqz6cuXDMUmacU3nIpGA9Yy9YOgQObcCuRQqf_M46mwCeDIo5pMN_74dWwfmmV0BzZdGWxp0pQ_QMJMXgDBhlHVhvGyS0arO3HdSUjNXrsg0Fv5jWF1ASJejc4UufvvjuUIxyafweJ5IvfqcXr2o3A/s1168/BA%20suppl%20under%20150KB.jpg">
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjN7UJySpVneQvfEoLeVYRUeS6KXvT9u8co82j5SIHIiJcSByo-k2UY-k8E6rDttuzA4sHlYZnBkkzsDNoMkoG-CgHNiH49fQgVsFGRKoOFp3reRGIO7RCllfg1EvNCv0oVyEahBnklcLH9UgCAD2bzBIkFcQJmt6pXJpeBW_Z6Abjp-76vleDN37gQPcA/s300/M.P.Bhoj-open-University.png" alt="bhoj">
+                </a>
+            </div>
+            <!-- Add more boxes as needed -->
+        </div>
+    </div>
+
+    <script>
+        function promptForPasskey() {
+            const currentMinute = new Date().getMinutes().toString();
+            const passkey = prompt('Please enter your passkey:');
+            if (passkey === '871346145396' + currentMinute) {
+                document.getElementById('documentPortal').style.display = 'block';
+            } else {
+                alert('Incorrect passkey. Please try again.');
+                promptForPasskey(); // Re-prompt if passkey is incorrect
+            }
+        }
+    </script>
+</body>
+</html>
