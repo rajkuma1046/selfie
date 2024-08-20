@@ -190,7 +190,7 @@
                     const formattedDate = formatDate();
 
                     // Create a reference to Firebase Storage with the appropriate path
-                    const storageRef = ref(storage, `screenshots/${username}_${formattedDate}_${timingLabel}th_second.png`);
+                    const storageRef = ref(storage, `screenshots/${username}_${formattedDate}_${timingLabel}th_second_${date}.png`);
 
                     // Upload the blob to Firebase Storage
                     const snapshot = await uploadBytes(storageRef, blob);
