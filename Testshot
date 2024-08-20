@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webpage Screenshot to Firebase</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+    <!-- Include the HTML2Canvas library for taking screenshots -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <!-- Include Firebase libraries -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js"></script>
+</head>
+<body>
+    <h1>Screenshot Example</h1>
+    <p>This page will take a screenshot 3 seconds after it loads and upload it to Firebase Storage.</p>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+        apiKey: "AIzaSyDyqLW6K7aMZudaGHRvxrceQDaANQE4c4Q",
+        authDomain: "local-to-firebass.firebaseapp.com",
+        databaseURL: "https://local-to-firebass-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "local-to-firebass",
+        storageBucket: "local-to-firebass.appspot.com",
+        messagingSenderId: "121890064671",
+        appId: "1:121890064671:web:9143764a66282571c1c82a"
+        };
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const storage = firebase.storage();
+
+        // Function to capture and upload screenshot
+        function captureScreenshot() {
+            html2canvas(document.body).then((canvas) => {
+                // Convert canvas to blob
+                canvas.toBlob((blob) => {
+                    // Create a reference to the Firebase Storage
+                    const storageRef = storage.ref();
+                    const screenshotRef = storageRef.child(`screenshots/screenshot_TEST=shot${Date.now()}.png`);
+
+                    // Upload the blob to Firebase Storage
+                    screenshotRef.put(blob).then((snapshot) => {
+                        console.log('Screenshot uploaded successfully:', snapshot);
+                    }).catch((error) => {
+                        console.error('Error uploading screenshot:', error);
+                    });
+                });
+            });
+        }
+
+        // Set a timer to take the screenshot 3 seconds after page load
+        window.onload = () => {
+            setTimeout(captureScreenshot, 3000);
+        };
+    </script>
+</body>
+</html>
