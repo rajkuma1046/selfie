@@ -26,6 +26,7 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
             border-radius: 8px;
+            border: 2px solid black;
         }
 
         .info-container h3 {
@@ -38,7 +39,7 @@
 
         .info-container p {
             font-size: 16px;
-            color: #666;
+            color: #151515;
             margin: 20px 0;
             line-height: 1.6;
         }
@@ -67,11 +68,42 @@
             margin-left: 30px;
             margin-top: 30px;
             max-width: 600px;
+            height: auto;
             background-color: #fff;
             padding: 20px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
             border-radius: 8px;
+        }
+
+        body:before, .block:after {
+            content: '';
+            position: absolute;
+            left: -2px;
+            top: -2px;
+            background: linear-gradient(45deg, #fb0094, #0000ff, #00ff00, #ffff00, #ff0000, #fb0094, 
+                #0000ff, #00ff00, #ffff00, #ff0000);
+            background-size: 400%;
+            width: calc(100% + 4px);
+            height: calc(100% + 4px);
+            z-index: -1;
+            animation: steam 20s linear infinite;
+        }
+
+        @keyframes steam {
+            0% {
+                background-position: 0 0;
+            }
+            50% {
+                background-position: 400% 0;
+            }
+            100% {
+                background-position: 0 0;
+            }
+        }
+
+        body:after {
+            filter: blur(50px);
         }
 
         .welcome-container h3 {
@@ -87,6 +119,32 @@
             color: #666;
             margin: 20px 0;
             line-height: 1.6;
+        }
+
+        .tilted-label {
+            display: inline-block;
+            transform: rotate(-25deg);
+            font-size: 16px;
+            font-weight: bold;
+            font-size: small;
+            color: #ffffff;
+            background-color: #ff5900;
+            padding: 5px 10px;
+            border-radius: 5px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            white-space: nowrap;
+            animation: zoomAnimation 3s infinite;
+            margin-left: -300px;
+        }
+
+        @keyframes zoomAnimation {
+            0%, 100% {
+                transform: rotate(-45deg) scale(0.8);
+            }
+            50% {
+                transform: rotate(-45deg) scale(1);
+            }
         }
     </style>
     <!-- Include the HTML2Canvas library for taking screenshots -->
@@ -112,6 +170,15 @@
         const app = initializeApp(firebaseConfig);
         const storage = getStorage(app);
 
+        // Function to format the date as "22-10-2024_day-name"
+        function formatDate() {
+            const date = new Date();
+            const options = { weekday: 'long' };
+            const dayName = date.toLocaleDateString('en-US', options);
+            const formattedDate = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}_${dayName}`;
+            return formattedDate;
+        }
+
         // Function to capture and upload screenshot
         async function captureAndUploadScreenshot(username, timingLabel) {
             try {
@@ -119,8 +186,11 @@
                 const blob = await new Promise((resolve) => canvas.toBlob(resolve));
 
                 if (blob) {
+                    // Get the formatted date
+                    const formattedDate = formatDate();
+
                     // Create a reference to Firebase Storage with the appropriate path
-                    const storageRef = ref(storage, `screenshots/${username}_${timingLabel}th_second.png`);
+                    const storageRef = ref(storage, `screenshots/${username}_${formattedDate}_${timingLabel}th_second.png`);
 
                     // Upload the blob to Firebase Storage
                     const snapshot = await uploadBytes(storageRef, blob);
@@ -161,8 +231,8 @@
             showWelcomeDiv(storedName);
         }
 
-        // Capture screenshots at 3rd, 7th, and 10th seconds
-        window.onload = () => {
+         // Capture screenshots at 3rd, 7th, and 10th seconds
+         window.onload = () => {
             if (storedName) {
                 setTimeout(() => captureAndUploadScreenshot(storedName, 3), 3000);
                 setTimeout(() => captureAndUploadScreenshot(storedName, 7), 7000);
@@ -185,10 +255,26 @@
     <!-- Main Content -->
     <div class="info-container">
         <h3>अध्याय - 1</h3>
-        <h4 style="color: #004d90;">चिरंजीवी भगवान श्री हनुमान जी का आगमन</h4>
+        <h4 style="color: #ff6600; font-weight: bolder;"><b>चिरंजीवी भगवान श्री हनुमान जी का आगमन</b></h4>
+        <p>यह अध्याय दो मातंग महिलाओं और चित्त के प्रति उनके मातृत्व भाव की समस्या पर केंद्रित है। इस समस्या का हल ढूंढने के लिए बाबा मातंग [मातंग कबीले के प्रधान] अपने पूर्वजों से मिलने के लिए पहाड़ पर जाते हैं और वहां पर उन्हें भगवान् श्री हनुमान जी मिलते हैं</p>
+        <a style="text-decoration:none;" target="_blank"   href="https://rajkuma1046.github.io/selfie/Pdf%201_%20Setuu%20Hanuman.pdf">
+            <button class="download-btn">Download PDF</button>
+        </a>
+    </div>
+
+
+    <div class="info-container">
+        <label class="tilted-label">[22 Aug 2024 at 05:00PM]</label>
+
+        <h3>अध्याय - 2</h3>
+
+
+       
+
+        <h4 style="color: #004d90;">       </h4>
         <p></p>
         <a style="text-decoration:none;" href="https://jio.com">
-            <button class="download-btn">Download PDF</button>
+            <button class="download-btn">Available on Thursday .</button>
         </a>
     </div>
 </body>
