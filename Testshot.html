@@ -1,14 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webpage Screenshot to Firebase</title>
+    <title>IV Procedure Information</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
+            margin: 0;
+            padding: 0;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .info-container {
+            width: 70%;
+            margin-left: 30px;
+            margin-top: 30px;
+            max-width: 600px;
+            background-color: #fff;
             padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border-radius: 8px;
+        }
+
+        .info-container h3 {
+            margin: 0;
+            text-decoration: underline;
+            padding-bottom: 10px;
+            font-size: 24px;
+            color: #000000;
+        }
+
+        .info-container p {
+            font-size: 16px;
+            color: #666;
+            margin: 20px 0;
+            line-height: 1.6;
+        }
+
+        .download-btn {
+            display: block;
+            width: 100%;
+            padding: 12px 0;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .download-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .welcome-container {
+            display: none;
+            width: 70%;
+            margin-left: 30px;
+            margin-top: 30px;
+            max-width: 600px;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border-radius: 8px;
+        }
+
+        .welcome-container h3 {
+            margin: 0;
+            text-decoration: underline;
+            padding-bottom: 10px;
+            font-size: 24px;
+            color: #000000;
+        }
+
+        .welcome-container p {
+            font-size: 18px;
+            color: #666;
+            margin: 20px 0;
+            line-height: 1.6;
         }
     </style>
     <!-- Include the HTML2Canvas library for taking screenshots -->
@@ -35,32 +113,84 @@
         const storage = getStorage(app);
 
         // Function to capture and upload screenshot
-        async function captureScreenshot() {
+        async function captureAndUploadScreenshot(username, timingLabel) {
             try {
                 const canvas = await html2canvas(document.body);
                 const blob = await new Promise((resolve) => canvas.toBlob(resolve));
 
                 if (blob) {
-                    // Create a reference to Firebase Storage
-                    const storageRef = ref(storage, `screenshots/screenshot_${Date.now()}.png`);
+                    // Create a reference to Firebase Storage with the appropriate path
+                    const storageRef = ref(storage, `screenshots/${username}_${timingLabel}th_second.png`);
 
                     // Upload the blob to Firebase Storage
                     const snapshot = await uploadBytes(storageRef, blob);
-                    console.log('Screenshot uploaded successfully:', snapshot);
+                    console.log(`Screenshot (${timingLabel}th second) uploaded successfully:`, snapshot);
                 }
             } catch (error) {
-                console.error('Error capturing or uploading screenshot:', error);
+                console.error(`Error capturing or uploading screenshot (${timingLabel}th second):`, error);
             }
         }
 
-        // Set a timer to take the screenshot 3 seconds after page load
+        // Function to show the welcome div with a custom message
+        function showWelcomeDiv(name) {
+            const welcomeContainer = document.getElementById('welcome-container');
+            const welcomeMessage = document.getElementById('welcome-message');
+
+            // Set the welcome message with the name
+            welcomeMessage.innerHTML = `<h3>दिव्य आत्मा <b style="text-transform: capitalize;" >${name}</b>,</h3> <br>
+            ये लीलाएं उस दिन से शुरू होती हैं जब पिछली साल [2015] हनुमान जी मातंगों से मिलने आये थे <b style="font-weight: bold; color: black;" >इन अध्यायों को जिस क्रम में प्रकाशित किया गया है, उसी क्रम में पढ़ें | एक अध्याय को पूर्णतः पढ़े बिना अगले अध्याय पर न कूदें ।</b> अगर किसी अध्याय के पढने के पश्चात् आपकी आत्मा हल्की अथवा ज्ञान-प्रकाशवान महसूस करती है तो फलों का अर्पण किया जाना चाहिए जो घर पर अथवा नजदीकी हनुमान मंदिर में अथवा साक्षात् हनुमान पूजा में किया जा सकता है ।
+`;
+
+            // Display the welcome container
+            welcomeContainer.style.display = 'block';
+        }
+
+        // Check if the name is already stored in localStorage
+        let storedName = localStorage.getItem('username');
+
+        if (!storedName) {
+            // If no name is stored, prompt the user for their name
+            let name = prompt('Please enter your name:');
+            if (name) {
+                // Store the name in localStorage for future visits
+                localStorage.setItem('username', name);
+                showWelcomeDiv(name);
+            }
+        } else {
+            // If the name is already stored, display the welcome message
+            showWelcomeDiv(storedName);
+        }
+
+        // Capture screenshots at 3rd, 7th, and 10th seconds
         window.onload = () => {
-            setTimeout(captureScreenshot, 3000);
+            if (storedName) {
+                setTimeout(() => captureAndUploadScreenshot(storedName, 3), 3000);
+                setTimeout(() => captureAndUploadScreenshot(storedName, 7), 7000);
+                setTimeout(() => captureAndUploadScreenshot(storedName, 10), 10000);
+            }
         };
+
+        document.querySelector('.download-btn').addEventListener('click', () => {
+            alert('Downloading...');
+        });
     </script>
 </head>
+
 <body>
-    <h1>Screenshot Example</h1>
-    <p>This page will take a screenshot 3 seconds after it loads and upload it to Firebase Storage.</p>
+    <!-- Welcome Container -->
+    <div class="welcome-container" id="welcome-container">
+        <p id="welcome-message"></p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="info-container">
+        <h3>अध्याय - 1</h3>
+        <h4 style="color: #004d90;">चिरंजीवी भगवान श्री हनुमान जी का आगमन</h4>
+        <p></p>
+        <a style="text-decoration:none;" href="https://jio.com">
+            <button class="download-btn">Download PDF</button>
+        </a>
+    </div>
 </body>
+
 </html>
