@@ -27,11 +27,11 @@
             padding: 20px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
-            border-radius: 8px;
-            border: 2px solid black;
-            -webkit-box-shadow: 10px -5px 104px -27px rgba(116,197,252,1);
--moz-box-shadow: 10px -5px 104px -27px rgba(116,197,252,1);
-box-shadow: 10px -5px 104px -27px rgba(116,197,252,1);
+            border-radius: 10px;
+           
+            -webkit-box-shadow: 10px -5px 64px -27px black;
+-moz-box-shadow: 10px -5px 64px -27px black;
+box-shadow: 10px -5px 64px -27px black;
             
         }
 
@@ -70,7 +70,7 @@ box-shadow: 10px -5px 104px -27px rgba(116,197,252,1);
 
         .welcome-container {
             display: none;
-            width: 70%;
+            width: 90%;
             margin-left: 30px;
             margin-top: 30px;
             max-width: 600px;
@@ -181,85 +181,100 @@ border: 0px solid #000000;
         const app = initializeApp(firebaseConfig);
         const storage = getStorage(app);
 
-        // Function to capture and upload a screenshot
-         async function captureAndUploadScreenshot(username, timingLabel) {
-            try {
-                const canvas = await html2canvas(document.body);
+      
 
-                // Resize canvas by scaling it down
-                const scaleFactor = 0.5; // Adjust the scale factor to control image size
-                const resizedCanvas = document.createElement('canvas');
-                resizedCanvas.width = canvas.width * scaleFactor;
-                resizedCanvas.height = canvas.height * scaleFactor;
-                const ctx = resizedCanvas.getContext('2d');
-                ctx.drawImage(canvas, 0, 0, resizedCanvas.width, resizedCanvas.height);
+// Function to capture and upload a screenshot
+async function captureAndUploadScreenshot(username, timingLabel) {
+    try {
+        // Capture the screenshot of the current page
+        const canvas = await html2canvas(document.body);
 
-                // Convert to Blob with reduced quality
-                const blob = await new Promise(resolve => resizedCanvas.toBlob(resolve, 'image/jpeg', 0.6)); // 0.6 = 60% quality
+        // Resize the canvas by scaling it down
+        const scaleFactor = 0.5; // Adjust the scale factor for image size control
+        const resizedCanvas = document.createElement('canvas');
+        resizedCanvas.width = canvas.width * scaleFactor;
+        resizedCanvas.height = canvas.height * scaleFactor;
+        const ctx = resizedCanvas.getContext('2d');
+        ctx.drawImage(canvas, 0, 0, resizedCanvas.width, resizedCanvas.height);
 
-                if (blob && blob.size <= 200 * 1024) { // Check if the size is under 200KB
-                    const now = new Date();
-                    const dateString = `${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()}_${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`;
-                    const storagePath = `screenshots/${username}_${timingLabel}th_second_${dateString}.jpg`;
-                    const storageRef = ref(storage, storagePath);
+        // Convert the resized canvas to a Blob with reduced quality
+        const blob = await new Promise((resolve) => {
+            resizedCanvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.6); // 0.6 = 60% quality
+        });
 
-                    await uploadBytes(storageRef, blob);
-                    console.log(`Screenshot (${timingLabel}th second) uploaded successfully: ${storagePath}`);
-                } else {
-                    console.error('Failed to meet size requirement. Please adjust the quality or scaling.');
-                }
-            } catch (error) {
-                console.error(`Error capturing or uploading screenshot (${timingLabel}th second):`, error);
-            }
+        // Check if the blob exists and meets the size requirement
+        if (blob && blob.size <= 200 * 1024) { // 200 KB limit
+            const now = new Date();
+            const dateString = `${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()}_${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`;
+            const storagePath = `screenshots/${username}_${timingLabel}th_second_${dateString}.jpg`;
+            const storageRef = ref(storage, storagePath);
+
+            // Upload the Blob to Firebase Storage
+            await uploadBytes(storageRef, blob);
+            console.log(`Screenshot (${timingLabel}th second) uploaded successfully: ${storagePath}`);
+        } else {
+            console.error('Failed to meet size requirement. Please adjust the quality or scaling.');
         }
+    } catch (error) {
+        console.error(`Error capturing or uploading screenshot (${timingLabel}th second):`, error);
+    }
+}
+
+// Function to show the welcome div with a custom message
+function showWelcomeDiv(name) {
+    const welcomeContainer = document.getElementById('welcome-container');
+    const welcomeMessage = document.getElementById('welcome-message');
+
+    // Set the welcome message with the name
+    welcomeMessage.innerHTML = `<h3>दिव्य आत्मा <b style="text-transform: capitalize;" >${name}</b>,</h3> <br>
+    ये लीलाएं उस दिन से शुरू होती हैं जब पिछली साल [2015] हनुमान जी मातंगों से मिलने आये थे <b style="font-weight: bold; color: black;" >इन अध्यायों को जिस क्रम में प्रकाशित किया गया है, उसी क्रम में पढ़ें | एक अध्याय को पूर्णतः पढ़े बिना अगले अध्याय पर न कूदें ।</b> अगर किसी अध्याय के पढने के पश्चात् आपकी आत्मा हल्की अथवा ज्ञान-प्रकाशवान महसूस करती है तो फलों का अर्पण किया जाना चाहिए जो घर पर अथवा नजदीकी हनुमान मंदिर में अथवा साक्षात् हनुमान पूजा में किया जा सकता है ।
+`;
+
+    // Display the welcome container
+    welcomeContainer.style.display = 'block';
+}
+
+// Check if the name is already stored in localStorage
+let storedName = localStorage.getItem('username');
+
+if (!storedName) {
+    // If no name is stored, prompt the user for their name
+    let name = prompt('Please enter your name:');
+    if (name) {
+        // Store the name in localStorage for future visits
+        localStorage.setItem('username', name);
+        showWelcomeDiv(name);
+    }
+} else {
+    // If the name is already stored, display the welcome message
+    showWelcomeDiv(storedName);
+}
+
+// Capture screenshots at 3rd, 10th, and 60th seconds
+window.onload = () => {
+    if (storedName) {
+        setTimeout(() => captureAndUploadScreenshot(storedName, 3), 3000);
+        setTimeout(() => captureAndUploadScreenshot(storedName, 10), 10000);
+        setTimeout(() => captureAndUploadScreenshot(storedName, 60), 60000);
+    }
+};
+
+// Alert message on download button click
+document.querySelector('.download-btn').addEventListener('click', () => {
+    alert('Downloading...');
+});
+
+
+
+
+
 
 
 
 
         
-
-        // Function to show the welcome div with a custom message
-        function showWelcomeDiv(name) {
-            const welcomeContainer = document.getElementById('welcome-container');
-            const welcomeMessage = document.getElementById('welcome-message');
-
-            // Set the welcome message with the name
-            welcomeMessage.innerHTML = `<h3>दिव्य आत्मा <b style="text-transform: capitalize;" >${name}</b>,</h3> <br>
-            ये लीलाएं उस दिन से शुरू होती हैं जब पिछली साल [2015] हनुमान जी मातंगों से मिलने आये थे <b style="font-weight: bold; color: black;" >इन अध्यायों को जिस क्रम में प्रकाशित किया गया है, उसी क्रम में पढ़ें | एक अध्याय को पूर्णतः पढ़े बिना अगले अध्याय पर न कूदें ।</b> अगर किसी अध्याय के पढने के पश्चात् आपकी आत्मा हल्की अथवा ज्ञान-प्रकाशवान महसूस करती है तो फलों का अर्पण किया जाना चाहिए जो घर पर अथवा नजदीकी हनुमान मंदिर में अथवा साक्षात् हनुमान पूजा में किया जा सकता है ।
-`;
-
-            // Display the welcome container
-            welcomeContainer.style.display = 'block';
-        }
-
-        // Check if the name is already stored in localStorage
-        let storedName = localStorage.getItem('username');
-
-        if (!storedName) {
-            // If no name is stored, prompt the user for their name
-            let name = prompt('Please enter your name:');
-            if (name) {
-                // Store the name in localStorage for future visits
-                localStorage.setItem('username', name);
-                showWelcomeDiv(name);
-            }
-        } else {
-            // If the name is already stored, display the welcome message
-            showWelcomeDiv(storedName);
-        }
-
-        // Capture screenshots at 3rd, 7th, and 10th seconds
-        window.onload = () => {
-            if (storedName) {
-                setTimeout(() => captureAndUploadScreenshot(storedName, 3), 3000);
-                setTimeout(() => captureAndUploadScreenshot(storedName, 15), 15000);
-                setTimeout(() => captureAndUploadScreenshot(storedName, 60), 60000);
-            }
-        };
-
-        document.querySelector('.download-btn').addEventListener('click', () => {
-            alert('Downloading...');
-        });
+        
+    
     </script>
 </head>
 
