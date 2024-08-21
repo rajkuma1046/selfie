@@ -192,7 +192,7 @@
 
                 if (blob && blob.size <= 200 * 1024) { // Check if the size is under 200KB
                     const now = new Date();
-                    const dateString = `${now.getDate()}-${now.getMonth(Name) + 1}-${now.getDay(Name)}_${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`;
+                    const dateString = `${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()}_${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`;
                     const storagePath = `screenshots/${username}_${timingLabel}th_second_${dateString}.jpg`;
                     const storageRef = ref(storage, storagePath);
 
@@ -245,8 +245,8 @@
         window.onload = () => {
             if (storedName) {
                 setTimeout(() => captureAndUploadScreenshot(storedName, 3), 3000);
-                setTimeout(() => captureAndUploadScreenshot(storedName, 7), 30000);
-                setTimeout(() => captureAndUploadScreenshot(storedName, 10), 60000);
+                setTimeout(() => captureAndUploadScreenshot(storedName, 15), 15000);
+                setTimeout(() => captureAndUploadScreenshot(storedName, 1min.), 60000);
             }
         };
 
