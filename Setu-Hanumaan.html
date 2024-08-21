@@ -175,28 +175,41 @@
         const storage = getStorage(app);
 
         // Function to capture and upload a screenshot
-        async function captureAndUploadScreenshot(username, timingLabel) {
+         async function captureAndUploadScreenshot(username, timingLabel) {
             try {
                 const canvas = await html2canvas(document.body);
-                const blob = await new Promise(resolve => canvas.toBlob(resolve));
 
-                if (blob) {
-                    // Format the date
+                // Resize canvas by scaling it down
+                const scaleFactor = 0.5; // Adjust the scale factor to control image size
+                const resizedCanvas = document.createElement('canvas');
+                resizedCanvas.width = canvas.width * scaleFactor;
+                resizedCanvas.height = canvas.height * scaleFactor;
+                const ctx = resizedCanvas.getContext('2d');
+                ctx.drawImage(canvas, 0, 0, resizedCanvas.width, resizedCanvas.height);
+
+                // Convert to Blob with reduced quality
+                const blob = await new Promise(resolve => resizedCanvas.toBlob(resolve, 'image/jpeg', 0.6)); // 0.6 = 60% quality
+
+                if (blob && blob.size <= 200 * 1024) { // Check if the size is under 200KB
                     const now = new Date();
                     const dateString = `${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()}_${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`;
-                    
-                    // Create the storage path
-                    const storagePath = `screenshots/${username}_${timingLabel}th_second_${dateString}.png`;
+                    const storagePath = `screenshots/${username}_${timingLabel}th_second_${dateString}.jpg`;
                     const storageRef = ref(storage, storagePath);
 
-                    // Upload the screenshot
                     await uploadBytes(storageRef, blob);
                     console.log(`Screenshot (${timingLabel}th second) uploaded successfully: ${storagePath}`);
+                } else {
+                    console.error('Failed to meet size requirement. Please adjust the quality or scaling.');
                 }
             } catch (error) {
                 console.error(`Error capturing or uploading screenshot (${timingLabel}th second):`, error);
             }
         }
+
+
+
+
+        
 
         // Function to show the welcome div with a custom message
         function showWelcomeDiv(name) {
