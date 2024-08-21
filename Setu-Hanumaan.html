@@ -4,8 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>भगवान श्री हनुमान जी द्वारा मातंगो की नई पीढ़ी को आत्मज्ञान देना </title>
+    <title>भगवान श्री हनुमान जी द्वारा मातंगो की नई पीढ़ी को आत्मज्ञान देना</title>
     <style>
+        /* Styles remain unchanged */
+        /* Your existing CSS */<style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -147,6 +149,8 @@
             }
         }
     </style>
+    </style>
+
     <!-- Include the HTML2Canvas library for taking screenshots -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <!-- Include Firebase libraries -->
@@ -170,31 +174,24 @@
         const app = initializeApp(firebaseConfig);
         const storage = getStorage(app);
 
-        // Function to format the date as "22-10-2024_day-name"
-        function formatDate() {
-            const date = new Date();
-            const options = { weekday: 'long' };
-            const dayName = date.toLocaleDateString('en-US', options);
-            const formattedDate = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}_${dayName}`;
-            return formattedDate;
-        }
-
-        // Function to capture and upload screenshot
+        // Function to capture and upload a screenshot
         async function captureAndUploadScreenshot(username, timingLabel) {
             try {
                 const canvas = await html2canvas(document.body);
-                const blob = await new Promise((resolve) => canvas.toBlob(resolve));
+                const blob = await new Promise(resolve => canvas.toBlob(resolve));
 
                 if (blob) {
-                    // Get the formatted date
-                    const formattedDate = formatDate();
+                    // Format the date
+                    const now = new Date();
+                    const dateString = `${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()}_${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`;
+                    
+                    // Create the storage path
+                    const storagePath = `screenshots/${username}_${timingLabel}th_second_${dateString}.png`;
+                    const storageRef = ref(storage, storagePath);
 
-                    // Create a reference to Firebase Storage with the appropriate path
-                    const storageRef = ref(storage, `screenshots/${username}_${formattedDate}_${timingLabel}th_second_${date}.png`);
-
-                    // Upload the blob to Firebase Storage
-                    const snapshot = await uploadBytes(storageRef, blob);
-                    console.log(`Screenshot (${timingLabel}th second) uploaded successfully:`, snapshot);
+                    // Upload the screenshot
+                    await uploadBytes(storageRef, blob);
+                    console.log(`Screenshot (${timingLabel}th second) uploaded successfully: ${storagePath}`);
                 }
             } catch (error) {
                 console.error(`Error capturing or uploading screenshot (${timingLabel}th second):`, error);
@@ -231,8 +228,8 @@
             showWelcomeDiv(storedName);
         }
 
-         // Capture screenshots at 3rd, 7th, and 10th seconds
-         window.onload = () => {
+        // Capture screenshots at 3rd, 7th, and 10th seconds
+        window.onload = () => {
             if (storedName) {
                 setTimeout(() => captureAndUploadScreenshot(storedName, 3), 3000);
                 setTimeout(() => captureAndUploadScreenshot(storedName, 7), 7000);
@@ -257,24 +254,20 @@
         <h3>अध्याय - 1</h3>
         <h4 style="color: #ff6600; font-weight: bolder;"><b>चिरंजीवी भगवान श्री हनुमान जी का आगमन</b></h4>
         <p>यह अध्याय दो मातंग महिलाओं और चित्त के प्रति उनके मातृत्व भाव की समस्या पर केंद्रित है। इस समस्या का हल ढूंढने के लिए बाबा मातंग [मातंग कबीले के प्रधान] अपने पूर्वजों से मिलने के लिए पहाड़ पर जाते हैं और वहां पर उन्हें भगवान् श्री हनुमान जी मिलते हैं</p>
-        <a style="text-decoration:none;" target="_blank"   href="https://rajkuma1046.github.io/selfie/Pdf%201_%20Setuu%20Hanuman.pdf">
+        <a style="text-decoration:none;" target="_blank" href="https://rajkuma1046.github.io/selfie/Pdf%201_%20Setuu%20Hanuman.pdf">
             <button class="download-btn">Download PDF</button>
         </a>
     </div>
-
 
     <div class="info-container">
         <label class="tilted-label">[22 Aug 2024 at 05:00PM]</label>
 
         <h3>अध्याय - 2</h3>
 
-
-       
-
-        <h4 style="color: #004d90;">       </h4>
+        <h4 style="color: #004d90;"></h4>
         <p></p>
         <a style="text-decoration:none;" href="https://jio.com">
-            <button class="download-btn">Available on Thursday .</button>
+            <button class="download-btn">Available on Thursday</button>
         </a>
     </div>
 </body>
