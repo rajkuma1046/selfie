@@ -57,10 +57,13 @@
             <label for="message">Notification Message</label>
             <textarea id="message" rows="4" placeholder="Enter message"></textarea>
 
+            <label for="image">Notification Image (Optional)</label>
+            <input type="file" id="image" accept="image/*">
+
             <label for="time">Notification Time</label>
             <input type="datetime-local" id="time" required>
 
-            <button type="button" onclick="sendNotification()">Send Notification</button>
+            <button type="button" onclick="scheduleNotification()">Send Notification</button>
         </form>
     </div>
 
@@ -90,7 +93,7 @@
             .then(() => messaging.getToken())
             .then((token) => {
                 console.log('FCM Token:', token);
-                // You would typically send this token to your server to use for sending notifications
+                // Store or use this token to send notifications from the server
             })
             .catch((err) => {
                 console.error('Permission denied', err);
@@ -100,10 +103,11 @@
         // Call the function to get token on page load
         getMessagingToken();
 
-        // Send Notification function
-        function sendNotification() {
+        // Schedule notification
+        function scheduleNotification() {
             const title = document.getElementById('title').value;
             const message = document.getElementById('message').value;
+            const imageFile = document.getElementById('image').files[0];
             const time = document.getElementById('time').value;
 
             if (!title || !message || !time) {
@@ -111,9 +115,37 @@
                 return;
             }
 
-            // Simulate sending the notification
-            console.log('Notification Scheduled:', { title, message, time });
-            alert('Notification Scheduled');
+            // Convert selected time to a timestamp
+            const notificationTime = new Date(time).getTime();
+            const delay = notificationTime - new Date().getTime();
+
+            if (delay < 0) {
+                alert("Please select a future time!");
+                return;
+            }
+
+            // Display notification after the set delay
+            setTimeout(() => {
+                showNotification(title, message, imageFile);
+            }, delay);
+        }
+
+        // Show notification with or without image
+        function showNotification(title, message, imageFile) {
+            const options = {
+                body: message,
+            };
+
+            if (imageFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    options.image = e.target.result;  // Use the base64 encoded image
+                    new Notification(title, options);
+                };
+                reader.readAsDataURL(imageFile);
+            } else {
+                new Notification(title, options);
+            }
         }
     </script>
 </body>
