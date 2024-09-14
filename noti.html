@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Notification Maker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        label, input, textarea {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Create a Custom Notification</h1>
+        <form id="notificationForm">
+            <label for="title">Notification Title</label>
+            <input type="text" id="title" name="title" placeholder="Enter the notification title" required>
+
+            <label for="text">Notification Text</label>
+            <textarea id="text" name="text" rows="4" placeholder="Enter the notification text"></textarea>
+
+            <label for="image">Add Image (Optional)</label>
+            <input type="file" id="image" accept="image/*">
+
+            <label for="time">Set Notification Time</label>
+            <input type="datetime-local" id="time" name="time" required>
+
+            <label for="repeatTime">Repeat After (minutes)</label>
+            <input type="number" id="repeatTime" name="repeatTime" placeholder="Enter repeat time in minutes">
+
+            <button type="button" onclick="scheduleNotification()">Create Notification</button>
+        </form>
+    </div>
+
+    <script>
+
+
+      // Function to schedule notification
+function scheduleNotification() {
+    const title = document.getElementById('title').value;
+    const text = document.getElementById('text').value;
+    const time = document.getElementById('time').value;
+    const repeatTime = document.getElementById('repeatTime').value;
+    const imageFile = document.getElementById('image').files[0];
+
+    // Convert selected time to a timestamp
+    const notificationTime = new Date(time).getTime();
+
+    // Schedule the notification at the given time
+    const delay = notificationTime - new Date().getTime();
+    
+    if (delay < 0) {
+        alert("Please select a future time!");
+        return;
+    }
+
+    setTimeout(() => {
+        showNotification(title, text, imageFile);
+        
+        // Repeat notification if repeat time is set
+        if (repeatTime) {
+            const interval = repeatTime * 60 * 1000; // Convert minutes to milliseconds
+            setInterval(() => {
+                showNotification(title, text, imageFile);
+            }, interval);
+        }
+    }, delay);
+}
+
+// Function to show notification
+function showNotification(title, text, imageFile) {
+    if (!("Notification" in window)) {
+        alert("This browser does not support desktop notification");
+    } else if (Notification.permission === "granted") {
+        // Create notification
+        const options = {
+            body: text,
+        };
+        
+        if (imageFile) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                options.icon = e.target.result;
+                new Notification(title, options);
+            };
+            reader.readAsDataURL(imageFile);
+        } else {
+            new Notification(title, options);
+        }
+    } else if (Notification.permission !== "denied") {
+        Notification.requestPermission().then(function(permission) {
+            if (permission === "granted") {
+                showNotification(title, text, imageFile);
+            }
+        });
+    }
+}
+
+// Ask for permission to send notifications on page load
+if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+    Notification.requestPermission();
+}
+
+    </script>
+</body>
+</html>
