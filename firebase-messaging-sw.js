@@ -12,12 +12,12 @@ const firebaseConfig = {
   appId: "1:121890064671:web:9143764a66282571c1c82a"
 };
 
-// Initialize Firebase in Service Worker
+// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
 const messaging = firebase.messaging();
 
-// Background notification handler
+// Handle background messages
 messaging.onBackgroundMessage((payload) => {
     console.log('Received background message ', payload);
     const notificationTitle = payload.notification.title;
