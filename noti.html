@@ -48,6 +48,7 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            margin-bottom: 10px;
         }
         button:hover {
             background-color: #0056b3;
@@ -70,7 +71,7 @@
             <label for="time">Set Notification Time</label>
             <input type="datetime-local" id="time" name="time" required>
 
-            <label for="repeatTime">Repeat Interval</label>
+            <label for="repeatTime">Repeat Interval (Optional)</label>
             <div style="display: flex; gap: 10px;">
                 <input type="number" id="repeatTime" name="repeatTime" placeholder="Interval" min="1" style="flex: 1;">
                 <select id="repeatInterval" name="repeatInterval" style="flex: 1;">
@@ -82,6 +83,7 @@
             </div>
 
             <button type="button" onclick="scheduleNotification()">Create Notification</button>
+            <button type="button" onclick="scheduleDailyNotification()">Repeat Daily</button>
         </form>
     </div>
 
@@ -125,13 +127,41 @@
           setTimeout(() => {
               showNotification(title, text, imageFile);
 
-              // Repeat notification if repeat time is set
+              // If repeat time is provided, repeat notification at specified interval
               if (repeatTime) {
                   const intervalInMilliseconds = getRepeatTimeInMilliseconds(repeatTime, repeatInterval);
                   setInterval(() => {
                       showNotification(title, text, imageFile);
                   }, intervalInMilliseconds);
               }
+          }, delay);
+      }
+
+      // Function to schedule daily notification
+      function scheduleDailyNotification() {
+          const title = document.getElementById('title').value;
+          const text = document.getElementById('text').value;
+          const time = document.getElementById('time').value;
+          const imageFile = document.getElementById('image').files[0];
+
+          // Convert selected time to a timestamp
+          const notificationTime = new Date(time).getTime();
+          const delay = notificationTime - new Date().getTime();
+
+          if (delay < 0) {
+              alert("Please select a future time!");
+              return;
+          }
+
+          // Schedule the notification at the given time
+          setTimeout(() => {
+              showNotification(title, text, imageFile);
+              const oneDay = 24 * 60 * 60 * 1000; // Milliseconds in a day
+
+              // Repeat every day at the same time
+              setInterval(() => {
+                  showNotification(title, text, imageFile);
+              }, oneDay);
           }, delay);
       }
 
@@ -172,3 +202,4 @@
     </script>
 </body>
 </html>
+
