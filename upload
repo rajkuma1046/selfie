@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Upload to Firebase</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.container {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+input[type="file"] {
+  margin-bottom: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+#status {
+  margin-top: 20px;
+  color: #333;
+}</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Upload a File to Firebase Storage</h1>
+    <input type="file" id="fileInput">
+    <button id="uploadButton">Upload</button>
+    <p id="status"></p>
+  </div>
+  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-storage.js"></script>
+  <script>
+  // Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDyqLW6K7aMZudaGHRvxrceQDaANQE4c4Q",
+  authDomain: "local-to-firebass.firebaseapp.com",
+  databaseURL: "https://local-to-firebass-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "local-to-firebass",
+  storageBucket: "local-to-firebass.appspot.com",
+  messagingSenderId: "121890064671",
+  appId: "1:121890064671:web:9143764a66282571c1c82a"
+};
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const storage = firebase.storage();
+
+// DOM Elements
+const fileInput = document.getElementById('fileInput');
+const uploadButton = document.getElementById('uploadButton');
+const statusText = document.getElementById('status');
+
+// Upload File
+uploadButton.addEventListener('click', () => {
+  const file = fileInput.files[0];
+  if (file) {
+    const storageRef = storage.ref();
+    const fileRef = storageRef.child(file.name);
+    const uploadTask = fileRef.put(file);
+
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        // Progress monitoring
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        statusText.textContent = Uploading: ${Math.round(progress)}%;
+      },
+      (error) => {
+        // Handle errors
+        statusText.textContent = Error: ${error.message};
+      },
+      () => {
+        // Upload complete
+        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+          statusText.textContent = File uploaded successfully! Download URL: ${downloadURL};
+        });
+      }
+    );
+  } else {
+    statusText.textContent = 'Please select a file to upload.';
+  }
+});
+  </script>
+</body>
+</html>
