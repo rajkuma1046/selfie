@@ -73,10 +73,26 @@
     .history-list {
       margin-top: 30px;
     }
-    .history-list h2 {
-      font-size: 20px;
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       border-bottom: 1px solid #ccc;
       padding-bottom: 5px;
+    }
+    .history-header h2 {
+      font-size: 20px;
+      margin: 0;
+    }
+    .toggle-btn {
+      padding: 6px 12px;
+      font-size: 14px;
+      background-color: #17a2b8;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      width: auto;
     }
     .history-item {
       font-size: 14px;
@@ -85,6 +101,12 @@
       background: #fff;
       border: 1px solid #ddd;
       border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .history-details {
+      flex: 1;
     }
     .copy-btn {
       padding: 6px 10px;
@@ -94,6 +116,21 @@
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      width: auto;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #ccc;
+    }
+    .footer a {
+      margin: 0 10px;
+      color: #007bff;
+      text-decoration: none;
+    }
+    .footer a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -104,8 +141,15 @@
     <button id="uploadButton">Upload Selected Files</button>
     <div id="uploadList"></div>
     <div class="history-list">
-      <h2>Upload History</h2>
+      <div class="history-header">
+        <h2>Upload History</h2>
+        <button id="historyToggle" class="toggle-btn">Hide History</button>
+      </div>
       <div id="history"></div>
+    </div>
+    <div class="footer">
+      <a href="https://rajkuma1046.github.io/selfie/doc.html">Download documents</a>
+      <a href="https://rajkuma1046.github.io/selfie">Take selfie 🤳</a>
     </div>
   </div>
 
@@ -131,6 +175,7 @@
     const uploadButton = document.getElementById('uploadButton');
     const uploadList = document.getElementById('uploadList');
     const historyDiv = document.getElementById('history');
+    const historyToggle = document.getElementById('historyToggle');
 
     // Load history from localStorage
     let history = JSON.parse(localStorage.getItem('uploadHistory') || '[]');
@@ -139,11 +184,37 @@
       history.forEach(item => {
         const div = document.createElement('div');
         div.className = 'history-item';
-        div.innerHTML = `<strong>${item.name}</strong> &mdash; ${item.date} ${item.time}<br><a href="${item.url}" target="_blank">${item.url}</a>`;
+        div.innerHTML = `
+          <div class="history-details">
+            <strong>${item.name}</strong> — ${item.date} ${item.time}
+          </div>
+          <button class="copy-btn history-copy" data-url="${item.url}">Copy URL</button>
+        `;
         historyDiv.appendChild(div);
+      });
+
+      // attach copy functionality
+      document.querySelectorAll('.history-copy').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const url = btn.getAttribute('data-url');
+          navigator.clipboard.writeText(url);
+          btn.textContent = 'Copied!';
+          setTimeout(() => btn.textContent = 'Copy URL', 2000);
+        });
       });
     }
     renderHistory();
+
+    // Toggle history visibility
+    historyToggle.addEventListener('click', () => {
+      if (historyDiv.style.display === 'none') {
+        historyDiv.style.display = 'block';
+        historyToggle.textContent = 'Hide History';
+      } else {
+        historyDiv.style.display = 'none';
+        historyToggle.textContent = 'Show History';
+      }
+    });
 
     uploadButton.addEventListener('click', () => {
       const files = Array.from(fileInput.files);
@@ -162,11 +233,10 @@
       files.forEach(file => {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'file-item';
-        itemDiv.innerHTML = `<div class="file-info">
-                              <strong>${file.name}</strong>
-                              <div class="progress-bar"><div class="progress-bar-inner"></div></div>
-                            </div>
-                            <button class="copy-btn" disabled>Copy URL</button>`;
+        itemDiv.innerHTML = `<div class="file-info">` +
+                            `<strong>${file.name}</strong>` +
+                            `<div class="progress-bar"><div class="progress-bar-inner"></div></div>` +
+                            `</div><button class="copy-btn" disabled>Copy URL</button>`;
         uploadList.appendChild(itemDiv);
 
         const progressBar = itemDiv.querySelector('.progress-bar-inner');
