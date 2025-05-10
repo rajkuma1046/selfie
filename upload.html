@@ -3,67 +3,117 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>File Upload to Firebase</title>
+  <title>Enhanced File Upload to Firebase</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      background-color: #eef2f7;
       margin: 0;
-    }
-    
-    .container {
-      background: #fff;
       padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      text-align: center;
     }
-    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
     h1 {
       margin-bottom: 20px;
+      font-size: 24px;
+      text-align: center;
+      color: #333;
     }
-    
     input[type="file"] {
-      margin-bottom: 20px;
+      display: block;
+      margin: 20px auto;
     }
-    
     button {
-      padding: 10px 20px;
+      display: block;
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
       background-color: #007bff;
       color: #fff;
+      margin-bottom: 20px;
+    }
+    button:disabled {
+      background-color: #999;
+    }
+    .file-item {
+      margin-bottom: 15px;
+      padding: 10px;
+      background: #f9fafb;
+      border: 1px solid #dde1e7;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .file-info {
+      flex: 1;
+      margin-right: 10px;
+    }
+    .progress-bar {
+      height: 6px;
+      background: #e0e0e0;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .progress-bar-inner {
+      height: 100%;
+      width: 0;
+      background: #28a745;
+    }
+    .history-list {
+      margin-top: 30px;
+    }
+    .history-list h2 {
+      font-size: 20px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+    .history-item {
+      font-size: 14px;
+      margin-bottom: 10px;
+      padding: 10px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+    .copy-btn {
+      padding: 6px 10px;
+      font-size: 14px;
+      background: #17a2b8;
+      color: #fff;
       border: none;
-      border-radius: 5px;
+      border-radius: 4px;
       cursor: pointer;
-    }
-    
-    button:hover {
-      background-color: #0056b3;
-    }
-    
-    #status {
-      margin-top: 20px;
-      color: #333;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Upload a File to Firebase Storage</h1>
-    <input type="file" id="fileInput">
-    <button id="uploadButton">Upload</button>
-    <p id="status"></p>
+    <h1>Upload Up to 3 Files</h1>
+    <input type="file" id="fileInput" multiple accept="*/*">
+    <button id="uploadButton">Upload Selected Files</button>
+    <div id="uploadList"></div>
+    <div class="history-list">
+      <h2>Upload History</h2>
+      <div id="history"></div>
+    </div>
   </div>
-  
+
   <!-- Firebase Compat Libraries -->
   <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-storage-compat.js"></script>
-  
   <script>
-    // Your web app's Firebase configuration
+    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyDyqLW6K7aMZudaGHRvxrceQDaANQE4c4Q",
       authDomain: "local-to-firebass.firebaseapp.com",
@@ -73,49 +123,94 @@
       messagingSenderId: "121890064671",
       appId: "1:121890064671:web:9143764a66282571c1c82a"
     };
-
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const storage = firebase.storage();
 
-    // DOM Elements
+    // DOM elements
     const fileInput = document.getElementById('fileInput');
     const uploadButton = document.getElementById('uploadButton');
-    const statusText = document.getElementById('status');
+    const uploadList = document.getElementById('uploadList');
+    const historyDiv = document.getElementById('history');
 
-    // Upload File
+    // Load history from localStorage
+    let history = JSON.parse(localStorage.getItem('uploadHistory') || '[]');
+    function renderHistory() {
+      historyDiv.innerHTML = '';
+      history.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'history-item';
+        div.innerHTML = `<strong>${item.name}</strong> &mdash; ${item.date} ${item.time}<br><a href="${item.url}" target="_blank">${item.url}</a>`;
+        historyDiv.appendChild(div);
+      });
+    }
+    renderHistory();
+
     uploadButton.addEventListener('click', () => {
-      const file = fileInput.files[0];
-      if (file) {
-        const storageRef = storage.ref();
-        // Save file under the 'direct-upload' folder
-        const fileRef = storageRef.child('direct-upload/' + file.name);
-        const uploadTask = fileRef.put(file);
-
-        uploadTask.on('state_changed',
-          (snapshot) => {
-            // Progress monitoring
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            statusText.textContent = `Uploading: ${Math.round(progress)}%`;
-          },
-          (error) => {
-            // Handle errors
-            statusText.textContent = `Error: ${error.message}`;
-          },
-          () => {
-            // Upload complete: Retrieve the download URL
-            uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-              statusText.textContent = `File uploaded successfully! Download URL: ${downloadURL}`;
-            });
-          }
-        );
-      } else {
-        statusText.textContent = 'Please select a file to upload.';
+      const files = Array.from(fileInput.files);
+      if (files.length === 0) {
+        alert('Please select at least one file.');
+        return;
       }
+      if (files.length > 3) {
+        alert('You can upload a maximum of 3 files at once.');
+        return;
+      }
+
+      uploadList.innerHTML = '';
+      uploadButton.disabled = true;
+
+      files.forEach(file => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'file-item';
+        itemDiv.innerHTML = `<div class="file-info">
+                              <strong>${file.name}</strong>
+                              <div class="progress-bar"><div class="progress-bar-inner"></div></div>
+                            </div>
+                            <button class="copy-btn" disabled>Copy URL</button>`;
+        uploadList.appendChild(itemDiv);
+
+        const progressBar = itemDiv.querySelector('.progress-bar-inner');
+        const copyBtn = itemDiv.querySelector('.copy-btn');
+
+        const storageRef = storage.ref().child('direct-upload/' + file.name);
+        const uploadTask = storageRef.put(file);
+
+        uploadTask.on('state_changed', snapshot => {
+          const percent = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          progressBar.style.width = percent + '%';
+        }, error => {
+          alert('Error uploading ' + file.name + ': ' + error.message);
+        }, () => {
+          uploadTask.snapshot.ref.getDownloadURL().then(url => {
+            progressBar.style.width = '100%';
+            copyBtn.disabled = false;
+            copyBtn.addEventListener('click', () => {
+              navigator.clipboard.writeText(url);
+              copyBtn.textContent = 'Copied!';
+              setTimeout(() => copyBtn.textContent = 'Copy URL', 2000);
+            });
+
+            // save to history
+            const now = new Date();
+            const record = {
+              name: file.name,
+              date: now.toLocaleDateString(),
+              time: now.toLocaleTimeString(),
+              url
+            };
+            history.unshift(record);
+            localStorage.setItem('uploadHistory', JSON.stringify(history));
+            renderHistory();
+          });
+        });
+      });
+
+      // re-enable button after last upload
+      Promise.all(files.map(f => storage.ref('direct-upload/' + f.name).getDownloadURL())).finally(() => {
+        uploadButton.disabled = false;
+        fileInput.value = '';
+      });
     });
   </script>
-  <a href='https://rajkuma1046.github.io/selfie/doc.html'> Download documents</a>
-  <a href='https://rajkuma1046.github.io/selfie'> take selfie🤳 </a>
-
 </body>
 </html>
