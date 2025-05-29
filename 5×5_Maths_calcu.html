@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>5×5 Math Grid Checker</title>
+  <style>
+    :root {
+      --primary: #2196F3;
+      --success: #4CAF50;
+      --error: #F44336;
+      --light: #f9f9f9;
+      --font: 'Arial', sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 0; font-family: var(--font); background: var(--light); }
+    .container { max-width: 600px; margin: auto; padding: 10px; }
+    h1 { text-align: center; color: var(--primary); }
+    table {
+      width: auto; max-width: 100%; border-collapse: collapse;
+      margin: 10px 0; overflow-x: auto; display: block;
+    }
+    td, th {
+      border: 1px solid #333; width: 80px; height: 60px; position: relative;
+    }
+    td input {
+      width: 90%; height: 90%; border: 1px solid #999;
+      text-align: center; font-size: 1rem; margin: auto;
+      display: block; box-sizing: border-box; border-radius: 0;
+      appearance: auto;
+    }
+    td input:focus { outline: 2px solid var(--primary); }
+    td.incorrect {
+      background: rgba(244,67,54,0.2);
+      border: 2px solid var(--error);
+    }
+    .controls {
+      display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+    }
+    .controls button { margin: 5px; padding: 10px; font-size: 1rem; }
+    button {
+      background: var(--primary); color: #fff; border: none;
+      border-radius: 4px; cursor: pointer;
+    }
+    .result { margin: 10px 0; font-size: 1.1rem; text-align: center; }
+    .history-toggle { text-align: center; margin: 10px; }
+    .history-list {
+      max-height: 200px; overflow-y: auto; background: #fff;
+      border:1px solid #ccc; padding: 5px; display: none;
+    }
+    .history-item { border-bottom:1px solid #ddd; padding:5px; }
+    @media (max-width: 480px) {
+      td, th { height: 40px; }
+      .controls { flex-direction: column; }
+    }
+  </style>
+  <style>
+    
+    .container {
+    max-width: 600px;
+    margin: 2em auto;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    }
+    table { margin: 1em auto; border-collapse: collapse; }
+    input { width: 4em; text-align: center; }
+    
+    .controls button { margin: 0 0.5em; padding: 0.5em 1em; }
+    .result { margin-top: 1em; font-weight: bold; }
+    .history-toggle { margin-top: 1.5em; }
+    #sessionSummary { margin-top: 1em; font-style: italic; }
+    .history-list { margin-top: 0.5em; }
+    .history-item {
+      background: white;
+      color: black;
+      padding: 0.5em;
+      margin: 0.3em 0;
+      box-shadow: 0 2px 4px grey;
+      display: flex;
+      border-radius: 7px;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .history-item .info { flex-grow: 1; text-align: left; }
+    .delete-btn {
+      background: red;
+      border: none;
+      color: white;
+      font-size: 0.9em;
+      cursor: pointer;
+      padding: 0 0.5em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>5×5 Math Grid Checker</h1>
+    <table id="grid"></table>
+    <div class="controls">
+      <button id="checkButton" disabled>Check Grid</button>
+      <button id="resetButton">Reset Grid</button>
+    </div>
+    <div class="result" id="result"></div>
+    <div class="history-toggle">
+      <button id="toggleHistory">Show History</button>
+    </div>
+    <div id="sessionSummary"></div>
+    <div class="history-list" id="historyList"></div>
+  </div>  
+  
+  
+  <script>
+    const GRID_SIZE = 5;
+    const validR1 = [13, 17, 19]
+      .concat(Array.from({ length: 20 }, (_, i) => i + 21))
+      .filter(n => /^[1-9][0-9]$/.test(n));
+    const validC1 = Array.from({ length: 70 }, (_, i) => i + 30)
+      .filter(n => /^[1-9][0-9]$/.test(n));
+
+    let R1 = [], C1 = [];
+    let sessionStart;
+    const history = JSON.parse(localStorage.getItem('mathGridHistory') || '[]');
+
+    function formatDateTime(d) {
+      const day = d.getDate();
+      const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+      const month = monthNames[d.getMonth()];
+      const year = d.getFullYear();
+      let hours = d.getHours();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12 || 12;
+      const minutes = String(d.getMinutes()).padStart(2, '0');
+      return `${day} ${month} ${year}, ${hours}:${minutes}${ampm}`;
+    }
+
+    function initGrid() {
+      sessionStart = new Date();
+      R1 = shuffle(validR1).slice(0, GRID_SIZE);
+      C1 = shuffle(validC1).slice(0, GRID_SIZE);
+
+      const table = document.getElementById('grid');
+      table.innerHTML = '';
+
+      // Header row
+      let tr = document.createElement('tr');
+      tr.appendChild(document.createElement('td'));
+      for (let j = 0; j < GRID_SIZE; j++) {
+        const th = document.createElement('td');
+        th.textContent = R1[j];
+        th.style.fontWeight = 'bold';
+        tr.appendChild(th);
+      }
+      table.appendChild(tr);
+
+      // Data rows
+      for (let i = 0; i < GRID_SIZE; i++) {
+        tr = document.createElement('tr');
+        const th = document.createElement('td');
+        th.textContent = C1[i];
+        th.style.fontWeight = 'bold';
+        tr.appendChild(th);
+
+        for (let j = 0; j < GRID_SIZE; j++) {
+          const td = document.createElement('td');
+          const inp = document.createElement('input');
+          inp.type = 'number';
+          inp.dataset.row = i;
+          inp.dataset.col = j;
+          inp.addEventListener('input', checkReady);
+          td.appendChild(inp);
+          tr.appendChild(td);
+        }
+        table.appendChild(tr);
+      }
+
+      document.getElementById('checkButton').disabled = true;
+      document.getElementById('result').textContent = '';
+      hideHistory();
+      renderHistory();
+      document.getElementById('sessionSummary').textContent = '';
+    }
+
+    function shuffle(arr) {
+      return [...arr].sort(() => Math.random() - 0.5);
+    }
+
+    function checkReady() {
+      const inputs = [...document.querySelectorAll('#grid input')];
+      document.getElementById('checkButton').disabled = inputs.some(i => i.value === '');
+      document.querySelectorAll('#grid td').forEach(td => td.classList.remove('incorrect'));
+      document.getElementById('result').textContent = '';
+    }
+
+    document.getElementById('checkButton').addEventListener('click', () => {
+      const wrongMult = [];
+      for (let i = 0; i < GRID_SIZE; i++) {
+        for (let j = 0; j < GRID_SIZE; j++) {
+          const cell = document.querySelector(`input[data-row='${i}'][data-col='${j}']`);
+          const expected = C1[i] * R1[j];
+          const value = +cell.value;
+          if (value !== expected) {
+            wrongMult.push({ a: C1[i], b: R1[j], expected });
+            cell.parentElement.classList.add('incorrect');
+          }
+        }
+      }
+
+      const now = new Date();
+      const durationMs = now - sessionStart;
+      const durationSec = Math.round(durationMs / 1000);
+      const mins = Math.floor(durationSec / 60);
+      const secs = durationSec % 60;
+      const durationStr = `${mins}m ${secs}s`;
+
+      // Build detail string
+      const details = wrongMult.map(w => `${w.a}*${w.b}≠${w.expected}`).join(' and ');
+
+      const entry = {
+        time: formatDateTime(now),
+        errors: wrongMult.length,
+        details: details || 'None',
+        duration: durationSec
+      };
+      history.unshift(entry);
+      localStorage.setItem('mathGridHistory', JSON.stringify(history.slice(0, 20)));
+
+      // Show result message
+      const resultEl = document.getElementById('result');
+      if (wrongMult.length) {
+        resultEl.textContent = `${wrongMult.length} errors: ${details}`;
+        resultEl.style.color = 'var(--error)';
+      } else {
+        resultEl.textContent = `All correct in ${durationStr}!`;
+        resultEl.style.color = 'var(--success)';
+      }
+
+      renderHistory();
+    });
+
+    document.getElementById('resetButton').addEventListener('click', initGrid);
+
+    document.getElementById('toggleHistory').addEventListener('click', () => {
+      const list = document.getElementById('historyList');
+      const btn = document.getElementById('toggleHistory');
+      if (list.style.display === 'block') {
+        list.style.display = 'none';
+        btn.textContent = 'Show History';
+      } else {
+        list.style.display = 'block';
+        btn.textContent = 'Hide History';
+      }
+    });
+
+    function hideHistory() {
+      document.getElementById('historyList').style.display = 'none';
+      document.getElementById('toggleHistory').textContent = 'Show History';
+    }
+
+    function renderHistory() {
+      const list = document.getElementById('historyList');
+      const summaryEl = document.getElementById('sessionSummary');
+      list.innerHTML = '';
+      // Session comparison for most recent
+      if (history.length > 1) {
+        const current = history[0].duration;
+        const prev = history.slice(1).map(h => h.duration);
+        const avg = Math.round(prev.reduce((a, b) => a + b, 0) / prev.length);
+        const diff = current - avg;
+        const faster = diff < 0;
+        const diffAbs = Math.abs(diff);
+        const diffStr = `${Math.floor(diffAbs/60)}m ${diffAbs%60}s`;
+        summaryEl.textContent = `Session: ${history[0].durationString || ''}${current<60? current+'s': Math.floor(current/60)+'m '+current%60+'s'} — ${faster? 'faster':'slower'} than average (${avg<60? avg+'s': Math.floor(avg/60)+'m '+avg%60+'s'}) by ${diffStr}.`;
+      }
+
+      history.forEach((h, idx) => {
+        const div = document.createElement('div');
+        div.className = 'history-item';
+        const info = document.createElement('div');
+        info.className = 'info';
+        info.textContent = `[${h.time}] ${h.errors} errors: ${h.details} — ${Math.floor(h.duration/60)}m ${h.duration%60}s`;
+        const btn = document.createElement('button');
+        btn.className = 'delete-btn';
+        btn.textContent = 'Delete';
+        btn.dataset.index = idx;
+        btn.addEventListener('click', () => {
+          history.splice(idx, 1);
+          localStorage.setItem('mathGridHistory', JSON.stringify(history.slice(0,20)));
+          renderHistory();
+        });
+        div.appendChild(info);
+        div.appendChild(btn);
+        list.appendChild(div);
+      });
+    }
+    window.addEventListener('load', initGrid);
+     </script>
+     
+     
+     
+ </body>
+</html>
