@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mock Assessment App</title>
+  <!-- Tailwind CSS (for local dev only) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <!-- Recharts UMD -->
+  <script src="https://unpkg.com/recharts/umd/Recharts.min.js"></script>
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+  <div id="root" class="min-h-screen p-6"></div>
+
+  <script>
+    // pull in React & Recharts globals
+    const { useState, useEffect } = React;
+    const {
+      PieChart, Pie, Cell, Tooltip, ResponsiveContainer
+    } = Recharts;
+
+    const SECTIONS = ['Maths', 'Reasoning', 'English', 'GK'];
+    const TAGS = { unt: 'Unattempted', over: 'Over Time', wrong: 'Wrong' };
+    const COLORS = { unt: '#facc15', over: '#60a5fa', wrong: '#f87171' };
+
+    function App() {
+      const [mocks, setMocks] = useState(() => JSON.parse(localStorage.getItem('mocks') || '[]'));
+      const [newMock, setNewMock] = useState({
+        number: mocks.length + 1,
+        score: 0,
+        sections: SECTIONS.reduce((a,s)=>(a[s]=[],a), {})
+      });
+
+      useEffect(() => {
+        localStorage.setItem('mocks', JSON.stringify(mocks));
+      }, [mocks]);
+
+      const exportJSON = () => {
+        const blob = new Blob([JSON.stringify(mocks, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'mocks.json'; a.click();
+      };
+
+      const importJSON = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const data = JSON.parse(reader.result);
+            setMocks(data);
+            setNewMock(m => ({ ...m, number: data.length + 1 }));
+          } catch {
+            alert('Invalid JSON');
+          }
+        };
+        reader.readAsText(file);
+      };
+
+      const addTopic = sec => {
+        const text = document.getElementById(`${sec}-topic`).value.trim();
+        const tag  = document.getElementById(`${sec}-tag`).value;
+        if (!text) return;
+        setNewMock(m => ({
+          ...m,
+          sections: {
+            ...m.sections,
+            [sec]: [...m.sections[sec], { text, tag }]
+          }
+        }));
+        document.getElementById(`${sec}-topic`).value = '';
+      };
+
+      const saveMock = () => {
+        setMocks([...mocks, newMock]);
+        setNewMock({
+          number: newMock.number + 1,
+          score: 0,
+          sections: SECTIONS.reduce((a,s)=>(a[s]=[],a), {})
+        });
+      };
+
+      const combined = SECTIONS.reduce((acc,sec) => {
+        const all = mocks.flatMap(m=>m.sections[sec]);
+        const freq = {};
+        all.forEach(({text,tag}) => {
+          const k = text.toLowerCase();
+          if (!freq[k]) freq[k] = { text, tag, count: 0 };
+          freq[k].count++;
+        });
+        acc[sec] = Object.values(freq).sort((a,b)=>b.count-a.count);
+        return acc;
+      }, {});
+
+      const avgScore = mocks.length
+        ? Math.round(mocks.reduce((sum,m)=>sum+m.score,0)/mocks.length)
+        : 0;
+
+      return React.createElement('div', { className:'space-y-6' },
+
+        // Header + Export/Import
+        React.createElement('div', { className:'flex justify-between items-center' },
+          React.createElement('h1',{className:'text-2xl font-bold'},'Mock Assessment'),
+          React.createElement('div',null,
+            React.createElement('button',{
+              onClick:exportJSON,
+              className:'mr-2 px-4 py-2 bg-green-600 text-white rounded'
+            },'Export'),
+            React.createElement('label',{className:'px-4 py-2 bg-yellow-500 text-white rounded cursor-pointer'},
+              'Import',
+              React.createElement('input',{
+                type:'file', accept:'.json', className:'hidden', onChange:importJSON
+              })
+            )
+          )
+        ),
+
+        // New Mock Form
+        React.createElement('div',{className:'bg-white p-4 rounded shadow space-y-4'},
+          React.createElement('h2',{className:'font-semibold'},`Add Mock No. ${newMock.number}`),
+          React.createElement('div',{className:'flex items-center'},
+            'Score:',
+            React.createElement('input',{
+              type:'number', min:0, max:200, value:newMock.score,
+              onChange:e=>setNewMock({...newMock,score:+e.target.value}),
+              className:'ml-2 border p-1 rounded w-20'
+            })
+          ),
+          SECTIONS.map(sec =>
+            React.createElement('div',{key:sec,className:'flex items-center space-x-2'},
+              React.createElement('strong',null,sec),
+              React.createElement('input',{
+                id:`${sec}-topic`,type:'text',placeholder:'Topic',
+                className:'border p-1 rounded flex-1'
+              }),
+              React.createElement('select',{
+                id:`${sec}-tag`,className:'border p-1 rounded'
+              },
+                React.createElement('option',{value:'unt'},'Unattempted'),
+                React.createElement('option',{value:'over'},'Over Time'),
+                React.createElement('option',{value:'wrong'},'Wrong')
+              ),
+              React.createElement('button',{
+                onClick:()=>addTopic(sec),
+                className:'px-3 py-1 bg-blue-600 text-white rounded'
+              },'Add')
+            )
+          ),
+          React.createElement('button',{
+            onClick:saveMock,
+            className:'mt-2 px-4 py-2 bg-indigo-600 text-white rounded'
+          },'Save Mock')
+        ),
+
+        // Saved mocks
+        mocks.map(m =>
+          React.createElement('div',{key:m.number,className:'bg-white p-4 rounded shadow space-y-2'},
+            React.createElement('div',{className:'flex justify-between'},
+              React.createElement('h3',{className:'font-bold'},`Mock No. ${m.number}`),
+              React.createElement('span',null,`Score: ${m.score}/200`)
+            ),
+            React.createElement('div',{className:'grid grid-cols-4 gap-4'},
+              SECTIONS.map(sec =>
+                React.createElement('div',{key:sec,className:'border p-2 rounded max-h-48 overflow-y-auto'},
+                  React.createElement('h4',{className:'font-semibold mb-1'},sec),
+                  m.sections[sec].map((t,i)=>
+                    React.createElement('div',{key:i,style:{background:COLORS[t.tag]},className:'text-sm mb-1 p-1 rounded'},
+                      `[${TAGS[t.tag]}] ${t.text}`
+                    )
+                  )
+                )
+              )
+            )
+          )
+        ),
+
+        // Combined Summary
+        React.createElement('div',{className:'bg-white p-4 rounded shadow space-y-4'},
+          React.createElement('div',{className:'flex justify-between'},
+            React.createElement('h2',{className:'font-bold'},'Mock Combination'),
+            React.createElement('span',null,`Avg Score: ${avgScore}/200`)
+          ),
+          React.createElement('div',{className:'grid grid-cols-4 gap-4'},
+            SECTIONS.map(sec =>
+              React.createElement('div',{key:sec,className:'border p-2 rounded flex flex-col items-center'},
+                React.createElement('h4',{className:'font-semibold mb-2'},sec),
+                React.createElement(ResponsiveContainer,{width:'100%',height:120},
+                  React.createElement(PieChart,null,
+                    React.createElement(Pie,{
+                      data:Object.entries(TAGS).map(([k,name])=>({
+                        name, value: combined[sec].filter(x=>x.tag===k).reduce((s,x)=>s+x.count,0)
+                      })),
+                      dataKey:'value',innerRadius:20,outerRadius:40
+                    },
+                      Object.keys(TAGS).map(k=>
+                        React.createElement(Cell,{key:k,fill:COLORS[k]})
+                      )
+                    ),
+                    React.createElement(Tooltip,null)
+                  )
+                ),
+                React.createElement('div',{className:'mt-2 text-sm'},
+                  combined[sec].map((x,i)=>
+                    React.createElement('div',{key:i},`[${TAGS[x.tag]}] ${x.text} (${x.count})`)
+                  )
+                )
+              )
+            )
+          )
+        )
+      );
+    }
+
+    ReactDOM.render(React.createElement(App), document.getElementById('root'));
+  </script>
+</body>
+</html>
