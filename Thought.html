@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thought Evaluator (Multi-User)</title>
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Main Page Styles */
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f4f4f9;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    #app-loader {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(255,255,255,0.9); z-index: 10;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5em; color: #5A67D8;
+    }
+    #sync-status {
+        position: fixed; top: 10px; right: 10px; background-color: #5A67D8; color: white;
+        padding: 5px 10px; border-radius: 12px; font-size: 0.9em; z-index: 5;
+    }
+    .container {
+      width: 90%;
+      max-width: 800px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin: auto;
+      margin-bottom: 20px;
+    }
+    h1, h2, h3 {
+      color: #5A67D8;
+    }
+    textarea, input[type="text"], input[type="number"], input[type="email"], input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    /* Buttons */
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      background: #28a745;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background: #218838;
+    }
+    .btn-secondary {
+      background: #E53E3E;
+    }
+     .btn-secondary:hover {
+      background: #c53030;
+    }
+    .btn-edit {
+      background-color: #f0ad4e;
+      color: white;
+      width: 28px; height: 28px;
+      line-height: 28px; font-weight: bold;
+      border-radius: 50%; border: none;
+      cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .btn-edit:hover { background-color: #ec971f; }
+
+    /* --- Authentication Container --- */
+    #auth-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 80vh;
+    }
+    .auth-form {
+        width: 100%;
+        max-width: 400px;
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    #signup-form { display: none; }
+    .auth-toggle-link {
+        color: #5A67D8;
+        cursor: pointer;
+        margin-top: 15px;
+        display: inline-block;
+    }
+    #auth-error {
+        color: #E53E3E;
+        margin-top: 10px;
+        min-height: 1.2em;
+    }
+    #app-container { display: none; }
+    #logout-button {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        width: auto;
+        padding: 5px 15px;
+        font-size: 0.9em;
+    }
+
+    /* Chart and Calendar */
+    .chart-container { position: relative; height: 300px; width: 100%; margin-top: 20px; }
+    #calendar { margin-top: 20px; }
+    #calendar table { width: 100%; border-collapse: collapse; }
+    #calendar th, #calendar td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    #calendar th { background-color: #5A67D8; color: white; }
+    #calendar td:hover { background-color: #f0f0f0; cursor: pointer; }
+
+    /* Modal Styles */
+    .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
+    .modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 500px; border-radius: 10px; text-align: left; }
+    .close { color: #aaa; float: right; font-size: 24px; font-weight: bold; cursor: pointer; }
+    .modal-content ul { list-style: none; padding: 0; margin: 0; }
+    .modal-content li { padding: 10px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
+    .thought-content { flex-grow: 1; margin-right: 10px; }
+    .thought-controls { display: flex; gap: 8px; }
+    .timestamp { color: #666; font-size: 0.9em; }
+    .thought-text { font-size: 1em; margin-top: 5px; }
+    .prejudiced-tag { color: red; font-weight: bold; margin-left: 5px; }
+
+    /* Extra Boxes and Item Layout Fix */
+    .extra-boxes { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 30px; justify-content: center; }
+    .box { flex: 1; min-width: 280px; max-width: 380px; border: 1px solid #ccc; border-radius: 10px; padding: 10px; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.2); display: flex; flex-direction: column; max-height: 400px; }
+    .box-title { margin: 0; padding: 10px; text-align: center; background-color: darkred; color: white; border-radius: 6px; }
+    .box-content { padding: 10px; flex-grow: 1; overflow-y: auto; border-top: 1px solid #ddd; margin-top: 10px; }
+    .box-content ul { list-style: none; padding: 0; margin: 0; }
+    .box-content li { background: #e8f0ff; padding: 10px 15px; margin-bottom: 8px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .item-content { flex-grow: 1; text-align: left; word-break: break-word; }
+    .item-controls { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+    .delete-btn { background-color: red; color: white; border: none; border-radius: 50%; width: 28px; height: 28px; font-weight: bold; line-height: 28px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+    
+    .badge-container { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+    .badge { display: inline-flex; align-items: center; justify-content: center; padding: 4px 8px; margin: 2px; border-radius: 12px; color: #f8f9fa; font-size: 0.85em; font-weight: bold; }
+    .box-reset-btn { background: #E53E3E; width: auto; padding: 5px 10px; font-size: 14px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div id="app-loader">Initializing...</div>
+  
+  <!-- Authentication -->
+  <div id="auth-container">
+    <div id="login-form" class="auth-form">
+      <h2>Login</h2>
+      <input type="email" id="login-email" placeholder="Email" required>
+      <input type="password" id="login-password" placeholder="Password" required>
+      <button onclick="handleLogin()">Login</button>
+      <p class="auth-toggle-link" onclick="toggleAuthForms()">Don't have an account? Sign Up</p>
+    </div>
+    <div id="signup-form" class="auth-form">
+      <h2>Sign Up</h2>
+      <input type="email" id="signup-email" placeholder="Email" required>
+      <input type="password" id="signup-password" placeholder="Password (min. 6 characters)" required>
+      <button onclick="handleSignUp()">Sign Up</button>
+      <p class="auth-toggle-link" onclick="toggleAuthForms()">Already have an account? Login</p>
+    </div>
+    <p id="auth-error"></p>
+  </div>
+
+  <!-- Main Application -->
+  <div id="app-container">
+    <div id="sync-status">Connecting...</div>
+    <button id="logout-button" class="btn-secondary" onclick="handleLogout()">Logout</button>
+    <div class="container">
+      <h1>Thought Evaluator</h1>
+      <input type="hidden" id="editingThoughtId" />
+      <textarea id="thoughtInput" placeholder="Write your thought..."></textarea>
+      <input type="text" id="thoughtLabels" placeholder="Additional labels (comma-separated)" />
+      <div class="category-container" id="categories">
+        <label><input type="checkbox" value="बुद्धि" /> बुद्धि</label>
+        <label><input type="checkbox" value="विवेक" /> विवेक</label>
+        <label><input type="checkbox" value="संस्कार" /> संस्कार</label>
+        <label><input type="checkbox" value="चित्त" /> चित्त</label>
+        <label><input type="checkbox" value="शरीर" /> शरीर</label>
+      </div>
+      <div class="checkbox-container">
+        <label><input type="checkbox" id="prejudiced" /> Prejudiced</label>
+      </div>
+      <button id="saveThoughtBtn" onclick="saveThought()">Save Thought</button>
+      <button class="btn-secondary" onclick="resetAllData()">Reset All Data</button>
+      
+      <h2>Thought Analysis</h2>
+      <div class="chart-container"><canvas id="thoughtClock"></canvas></div>
+      
+      <h3>Monthly Calendar</h3>
+      <div class="nav-buttons">
+        <button onclick="prevMonth()">&lt; Previous Month</button>
+        <span id="calendarMonthYear"></span>
+        <button onclick="nextMonth()">Next Month &gt;</button>
+      </div>
+      <div id="calendar"></div>
+    </div>
+
+    <div id="modal" class="modal"><div class="modal-content"><span class="close" id="closeModal">&times;</span><h3 id="modalHeader"></h3><div id="modalData"></div></div></div>
+
+    <div class="extra-boxes">
+        <div class="box" id="box1">
+            <h3 class="box-title">Buddhy > Past Memories & Experiences</h3>
+            <div class="box-content">
+                <div id="birthYearContainer"><label>Your Birth Year: <input type="number" id="birthYearInput" placeholder="e.g. 1990" /></label><button onclick="saveBirthYear()">Save</button></div>
+                <div id="memoryInputSection"><input type="hidden" id="editingMemoryId" /><textarea id="memoryText" placeholder="Enter your memory..."></textarea><input type="number" id="memoryYear" placeholder="Year of memory" /><button id="saveMemoryBtn" onclick="saveMemory()">Save</button></div>
+                <button class="box-reset-btn" onclick="resetBox('memories')">Reset Box</button>
+                <div id="memoryList" class="list-container"></div>
+            </div>
+        </div>
+        <div class="box" id="box2">
+            <h3 class="box-title">Sanskar > Ego (aham)</h3>
+            <div class="box-content"><input type="hidden" id="editingEgoId" /><textarea id="egoText" placeholder="Enter ego description..."></textarea><input type="text" id="egoLabels" placeholder="Labels (comma-separated)" /><button id="saveEgoBtn" onclick="saveEgo()">Save</button><button class="box-reset-btn" onclick="resetBox('ego')">Reset Box</button><div id="egoList" class="list-container"></div></div>
+        </div>
+        <div class="box" id="box3">
+            <h3 class="box-title">Sanskar > Habits</h3>
+            <div class="box-content"><input type="hidden" id="editingHabitsId" /><textarea id="habitsText" placeholder="Enter habit..."></textarea><input type="text" id="habitsLabels" placeholder="Labels (comma-separated)" /><button id="saveHabitsBtn" onclick="saveHabit()">Save</button><button class="box-reset-btn" onclick="resetBox('habits')">Reset Box</button><div id="habitsList" class="list-container"></div></div>
+        </div>
+    </div>
+    
+    <!-- Data Import Section -->
+    <div class="container" id="data-management-container">
+        <h3>Data Management</h3>
+        <p>To import data from an old `thoughts_data.json` file, choose the file below. This will **replace** all data in your current account.</p>
+        <input type="file" id="importFile" onchange="importOldJsonData(event)" accept=".json">
+    </div>
+
+  </div>
+
+  <script>
+    // --- Firebase Configuration ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyDyqLW6K7aMZudaGHRvxrceQDaANQE4c4Q",
+        authDomain: "local-to-firebass.firebaseapp.com",
+        databaseURL: "https://local-to-firebass-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "local-to-firebass",
+        storageBucket: "local-to-firebass.appspot.com",
+        messagingSenderId: "121890064671",
+        appId: "1:121890064671:web:9143764a66282571c1c82a"
+    };
+
+    // --- Global State ---
+    let firebaseDb, firebaseAuth, userId;
+    let AppData = { thoughts: {}, memories: {}, ego: {}, habits: {}, birthYear: '' };
+    const AppState = { currentDateForModal: null };
+
+    // --- Firebase & App Initialization ---
+    function initializeFirebase() {
+        try {
+            firebase.initializeApp(firebaseConfig);
+            firebaseAuth = firebase.auth();
+            firebaseDb = firebase.database();
+            handleAuthentication();
+        } catch (error) {
+            console.error("Firebase initialization failed:", error);
+            document.getElementById('app-loader').innerText = 'Connection Failed.';
+        }
+    }
+
+    function handleAuthentication() {
+        firebaseAuth.onAuthStateChanged(user => {
+            const loader = document.getElementById('app-loader');
+            const authContainer = document.getElementById('auth-container');
+            const appContainer = document.getElementById('app-container');
+
+            if (user) { // User is signed in
+                userId = user.uid;
+                authContainer.style.display = 'none';
+                appContainer.style.display = 'block';
+                loader.style.display = 'flex';
+                loader.innerText = 'Loading Data...';
+                loadDataFromFirebase();
+            } else { // User is signed out
+                userId = null;
+                AppData = { thoughts: {}, memories: {}, ego: {}, habits: {}, birthYear: '' };
+                authContainer.style.display = 'flex';
+                appContainer.style.display = 'none';
+                loader.style.display = 'none';
+                updateAllViews(); // Clear views
+            }
+        });
+    }
+
+    // --- Authentication UI Logic ---
+    function toggleAuthForms() {
+        document.getElementById('login-form').style.display = document.getElementById('login-form').style.display === 'none' ? 'block' : 'none';
+        document.getElementById('signup-form').style.display = document.getElementById('signup-form').style.display === 'none' ? 'block' : 'none';
+        document.getElementById('auth-error').innerText = '';
+    }
+    
+    function handleSignUp() {
+        const email = document.getElementById('signup-email').value;
+        const password = document.getElementById('signup-password').value;
+        firebaseAuth.createUserWithEmailAndPassword(email, password)
+            .catch(error => document.getElementById('auth-error').innerText = error.message);
+    }
+    
+    function handleLogin() {
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        firebaseAuth.signInWithEmailAndPassword(email, password)
+            .catch(error => document.getElementById('auth-error').innerText = error.message);
+    }
+
+    function handleLogout() {
+        firebaseAuth.signOut();
+    }
+    
+    // --- Data Loading & Sync Status ---
+    function setSyncStatus(status) {
+        const statusEl = document.getElementById('sync-status');
+        if (!statusEl) return;
+        statusEl.textContent = status;
+        if (status === 'Error') {
+            statusEl.style.backgroundColor = '#E53E3E';
+        } else if (status === 'Synced') {
+            statusEl.style.backgroundColor = '#28a745';
+        } else {
+            statusEl.style.backgroundColor = '#f0ad4e';
+        }
+    }
+    function loadDataFromFirebase() {
+        if (!userId) return;
+        const userRef = firebaseDb.ref('users/' + userId);
+        userRef.on('value', snapshot => {
+            const data = snapshot.val() || {};
+            AppData = { thoughts: data.thoughts || {}, memories: data.memories || {}, ego: data.ego || {}, habits: data.habits || {}, birthYear: data.birthYear || '' };
+            document.getElementById('app-loader').style.display = 'none';
+            setSyncStatus('Synced');
+            updateAllViews();
+        }, error => {
+            console.error("Firebase data read failed:", error);
+            setSyncStatus('Error');
+            document.getElementById('app-loader').innerText = 'Failed to load data.';
+        });
+    }
+
+    // --- NEW: JSON Data Import Function (FIXED) ---
+    function importOldJsonData(event) {
+        if (!userId) {
+            alert("Please log in before importing data.");
+            return;
+        }
+        const file = event.target.files[0];
+        if (!file) return;
+
+        if (!confirm("This will REPLACE all current data in your account with the data from the file. This action cannot be undone. Continue?")) {
+            event.target.value = ''; // Reset file input
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                
+                // Helper to convert array from JSON to object for Firebase, ensuring unique IDs
+                const convertArrayToObject = (arr = []) => {
+                    const obj = {};
+                    if (Array.isArray(arr)) {
+                        arr.forEach((item, index) => {
+                            // Create a robust unique ID if one doesn't exist
+                            const key = item.id || item.timestamp || (Date.now() + index);
+                            item.id = key; // Ensure the item itself has the ID
+                            obj[key] = item;
+                        });
+                    }
+                    return obj;
+                };
+
+                const dataToUpload = {
+                    birthYear: importedData.birthYear || '',
+                    thoughts: convertArrayToObject(importedData.thoughts),
+                    memories: convertArrayToObject(importedData.memories),
+                    ego: convertArrayToObject(importedData.ego),
+                    habits: convertArrayToObject(importedData.habits)
+                };
+
+                setSyncStatus('Importing...');
+                firebaseDb.ref('users/' + userId).set(dataToUpload)
+                    .then(() => {
+                        alert("Data imported successfully!");
+                        event.target.value = ''; // Reset file input
+                    })
+                    .catch(err => {
+                        alert("An error occurred during import.");
+                        console.error(err);
+                        setSyncStatus('Error');
+                    });
+
+            } catch (err) {
+                alert("Failed to read JSON file. Please ensure it is a valid format.");
+                console.error(err);
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    // Utility Functions
+    function getLabelColors(labels) { const palette = ["#2c3e50", "#8e44ad", "#16a085", "#27ae60", "#2980b9", "#d35400", "#c0392b", "#e67e22", "#1abc9c"]; return (labels || []).map((_, i) => palette[i % palette.length]); }
+    function getISTTimestamp() { const now = new Date(); const dateIST = now.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }); const timeIST = now.toLocaleTimeString('en-GB', { timeZone: 'Asia/Kolkata', hour12: false }); return { date: dateIST, time: timeIST, full: `${dateIST} ${timeIST}` }; }
+
+    // --- CRUD ---
+    function saveData(type, data, callback) { if(!userId) return; const editingId = data.id; const itemId = editingId || Date.now(); data.id = itemId; setSyncStatus('Saving...'); firebaseDb.ref(`users/${userId}/${type}/${itemId}`).set(data).then(() => { if (callback) callback(); }).catch(error => { console.error(`Error saving ${type}:`, error); setSyncStatus('Error'); }); }
+    function deleteItem(type, id) { if(!userId) return; setSyncStatus('Deleting...'); firebaseDb.ref(`users/${userId}/${type}/${id}`).remove().catch(error => { console.error(`Error deleting ${type}:`, error); setSyncStatus('Error'); }); }
+    function resetBox(boxKey) { if(!userId) return; if (confirm(`Reset all items in this box (${boxKey})?`)) { setSyncStatus('Deleting...'); firebaseDb.ref(`users/${userId}/${boxKey}`).remove().catch(error => { console.error(`Error resetting box:`, error); setSyncStatus('Error'); }); } }
+    function resetAllData() { if(!userId) return; if (confirm("This will permanently delete all your data from the cloud. Are you sure?")) { setSyncStatus('Deleting All...'); firebaseDb.ref('users/' + userId).remove().then(() => { resetAllForms(); }).catch(error => { console.error("Error resetting data: ", error); setSyncStatus('Error'); }); } };
+    
+    // Thought Specific
+    function saveThought() { if(!userId) return; const thought = document.getElementById("thoughtInput").value; const prejudiced = document.getElementById("prejudiced").checked; let categories = Array.from(document.querySelectorAll("#categories input:checked")).map(cb => ({ type: cb.value })); if (!thought.trim() || !categories.length) { alert("Please enter a thought and select at least one category."); return; } const userLabels = document.getElementById("thoughtLabels").value.split(',').map(l => l.trim()).filter(Boolean); const categoryLabels = categories.map(cat => cat.type); const combinedLabels = new Set([...userLabels, ...categoryLabels]); if (prejudiced) combinedLabels.add("Prejudiced"); const finalLabels = Array.from(combinedLabels); const editingId = document.getElementById("editingThoughtId").value; const thoughtId = editingId || Date.now(); const thoughtData = { id: thoughtId, thought, categories, labels: finalLabels, prejudiced, timestamp: editingId ? (AppData.thoughts[editingId]?.timestamp || getISTTimestamp().full) : getISTTimestamp().full }; saveData('thoughts', thoughtData, resetThoughtForm); };
+    function deleteThought(id) { if(!userId) return; if(confirm("Are you sure you want to delete this thought?")) { deleteItem('thoughts', id); if (AppState.currentDateForModal) { setTimeout(() => openModal(AppState.currentDateForModal), 100); } } };
+
+    // Other Boxes
+    function saveBirthYear() { if(!userId) return; const birthYear = document.getElementById("birthYearInput").value; if (birthYear && birthYear > 1900 && birthYear < new Date().getFullYear()) { setSyncStatus('Saving...'); firebaseDb.ref(`users/${userId}/birthYear`).set(birthYear).catch(err => { console.error(err); setSyncStatus('Error'); }); } else { alert("Please enter a valid birth year."); } }
+    function saveMemory() { if(!userId) return; const memoryText = document.getElementById("memoryText").value; const memoryYear = parseInt(document.getElementById("memoryYear").value); if (!AppData.birthYear) { alert("Please save your birth year first."); return; } if (!memoryText.trim() || !memoryYear || memoryYear <= AppData.birthYear || memoryYear > new Date().getFullYear()) { alert("Please enter valid memory text and a year after your birth year."); return; } saveData('memories', { id: document.getElementById("editingMemoryId").value, memoryText, memoryYear, ageAtMemory: memoryYear - AppData.birthYear }, resetMemoryForm); };
+    const saveEgo = () => { if(!userId) return; saveData('ego', { id: document.getElementById('editingEgoId').value, egoText: document.getElementById('egoText').value, egoLabels: document.getElementById('egoLabels').value.split(',').map(l => l.trim()).filter(Boolean) }, () => resetForm('ego')); };
+    const saveHabit = () => { if(!userId) return; saveData('habits', { id: document.getElementById('editingHabitsId').value, habitsText: document.getElementById('habitsText').value, habitsLabels: document.getElementById('habitsLabels').value.split(',').map(l => l.trim()).filter(Boolean) }, () => resetForm('habits')); };
+
+    // --- UI Update Functions ---
+    // Lists
+    function updateMemoryList() { document.getElementById("birthYearContainer").style.display = AppData.birthYear ? 'none' : 'block'; const memories = Object.values(AppData.memories || {}).sort((a, b) => a.memoryYear - b.memoryYear); let html = "<ul>"; memories.forEach(m => { html += `<li><div class="item-content"><strong>${m.memoryYear}</strong> (Age: ${m.ageAtMemory}): ${m.memoryText}</div><div class="item-controls"><button class="btn-edit" onclick="editMemory('${m.id}')">&#9998;</button><button class="delete-btn" onclick="deleteItem('memories', '${m.id}')">&times;</button></div></li>`; }); document.getElementById("memoryList").innerHTML = html + "</ul>"; }
+    function updateList(type) { const items = Object.values(AppData[type] || {}); let html = "<ul>"; items.forEach(item => { const text = item[`${type}Text`] || item.egoText || item.habitsText; const labels = item[`${type}Labels`] || item.egoLabels || item.habitsLabels; const colors = getLabelColors(labels); const labelsHtml = (labels || []).map((l, idx) => `<span class="badge" style="background-color:${colors[idx]};">#${l}</span>`).join(' '); html += `<li><div class="item-content">${text} <br/><div class="badge-container">${labelsHtml}</div></div><div class="item-controls"><button class="btn-edit" onclick="editItem('${type}', '${item.id}')">&#9998;</button><button class="delete-btn" onclick="deleteItem('${type}', '${item.id}')">&times;</button></div></li>`; }); document.getElementById(`${type}List`).innerHTML = html + "</ul>"; }
+    const updateEgoList = () => updateList('ego');
+    const updateHabitList = () => updateList('habits');
+
+    // Chart
+    let chart; 
+    function updateChart(dateFilter = null) { 
+        const targetDate = dateFilter || getISTTimestamp().date; 
+        const thoughts = Object.values(AppData.thoughts || {}); 
+        let data = { "बुद्धि": 0, "विवेक": 0, "संस्कार": 0, "चित्त": 0, "शरीर": 0 }; 
+        thoughts.forEach(t => { 
+            if (t.timestamp && t.timestamp.split(' ')[0] === targetDate) { 
+                (t.categories || []).forEach(cat => { 
+                    if (cat.type in data) data[cat.type]++; 
+                }); 
+            } 
+        }); 
+        const ctx = document.getElementById("thoughtClock").getContext("2d"); 
+        if (chart) chart.destroy(); 
+        let values = Object.values(data); 
+        if (values.every(val => val === 0)) values = [1, 1, 1, 1, 1]; 
+        chart = new Chart(ctx, { 
+            type: "polarArea", 
+            data: { 
+                labels: Object.keys(data), 
+                datasets: [{ 
+                    data: values, 
+                    backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#8e44ad"] 
+                }] 
+            }, 
+            options: { responsive: true, maintainAspectRatio: false } 
+        }); 
+    };
+    
+    // Calendar
+    let currentCalendarYear, currentCalendarMonth; 
+    (function initCalendarState() { 
+        const now = new Date(); 
+        currentCalendarYear = now.getFullYear(); 
+        currentCalendarMonth = now.getMonth(); 
+    })();
+    function generateCalendar() { 
+        const calendarDiv = document.getElementById("calendar"); 
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]; 
+        document.getElementById("calendarMonthYear").innerText = `${monthNames[currentCalendarMonth]} ${currentCalendarYear}`; 
+        const firstDay = new Date(currentCalendarYear, currentCalendarMonth, 1).getDay(); 
+        const daysInMonth = new Date(currentCalendarYear, currentCalendarMonth + 1, 0).getDate(); 
+        let table = '<table><thead><tr>' + ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(d => `<th>${d}</th>`).join('') + '</tr></thead><tbody><tr>'; 
+        for (let i = 0; i < firstDay; i++) table += "<td></td>"; 
+        const thoughtsByDate = {}; 
+        Object.values(AppData.thoughts || {}).forEach(t => { 
+            if(t.timestamp) { 
+                const date = t.timestamp.split(' ')[0]; 
+                thoughtsByDate[date] = true; 
+            } 
+        }); 
+        for (let day = 1; day <= daysInMonth; day++) { 
+            const dateStr = new Date(currentCalendarYear, currentCalendarMonth, day).toLocaleDateString('en-CA'); 
+            const hasThoughts = thoughtsByDate[dateStr]; 
+            table += `<td style="${hasThoughts ? 'background-color:#e2e8f0; font-weight:bold; cursor:pointer;' : 'cursor:pointer;'}" onclick="calendarCellClicked('${dateStr}')">${day}</td>`; 
+            if ((day + firstDay) % 7 === 0) table += "</tr><tr>"; 
+        } 
+        table += "</tr></tbody></table>"; 
+        calendarDiv.innerHTML = table; 
+    };
+    function prevMonth() { currentCalendarMonth--; if (currentCalendarMonth < 0) { currentCalendarMonth = 11; currentCalendarYear--; } generateCalendar(); }
+    function nextMonth() { currentCalendarMonth++; if (currentCalendarMonth > 11) { currentCalendarMonth = 0; currentCalendarYear++; } generateCalendar(); }
+    function calendarCellClicked(dateStr) { updateChart(dateStr); openModal(dateStr); }
+    
+    // Modal
+    const modal = document.getElementById("modal");
+    document.getElementById("closeModal").onclick = () => { modal.style.display = "none"; updateChart(); };
+    window.onclick = (event) => { if (event.target == modal) { modal.style.display = "none"; updateChart(); } };
+    function openModal(dateStr) { 
+        AppState.currentDateForModal = dateStr; 
+        const filtered = Object.values(AppData.thoughts || {}).filter(t => t.timestamp && t.timestamp.split(' ')[0] === dateStr); 
+        document.getElementById("modalHeader").innerText = `Thoughts for ${dateStr}`; 
+        const modalData = document.getElementById("modalData"); 
+        if (filtered.length === 0) { 
+            modalData.innerHTML = "<p>No thoughts recorded for this day.</p>"; 
+        } else { 
+            let content = "<ul>"; 
+            filtered.sort((a,b) => b.id - a.id); 
+            filtered.forEach(t => { 
+                const time = t.timestamp.split(' ')[1]; 
+                const prejudiceTag = t.prejudiced ? '<span class="prejudiced-tag">pre-judged</span>' : ''; 
+                const colors = getLabelColors(t.labels); 
+                const labelsHtml = (t.labels || []).map((label, idx) => `<span class="badge" style="background-color:${colors[idx]};">#${label}</span>`).join(" "); 
+                content += `<li><div class="thought-content"><div class="timestamp">${time}</div><div class="thought-text">${t.thought} ${prejudiceTag}</div><div class="badge-container">${labelsHtml}</div></div><div class="thought-controls"><button class="btn-edit" onclick="editThought('${t.id}')">&#9998;</button><button class="delete-btn" onclick="deleteThought('${t.id}')">&times;</button></div></li>`; 
+            }); 
+            content += "</ul>"; 
+            modalData.innerHTML = content; 
+        } 
+        document.getElementById("modal").style.display = "block"; 
+    };
+    
+    // Edit & Form Reset Functions
+    function editThought(id) { 
+        const t = AppData.thoughts[id]; 
+        if (t) { 
+            document.getElementById("editingThoughtId").value = t.id; 
+            document.getElementById("thoughtInput").value = t.thought; 
+            document.getElementById("thoughtLabels").value = (t.labels || []).join(", "); 
+            document.getElementById("prejudiced").checked = t.prejudiced; 
+            document.querySelectorAll("#categories input").forEach(cb => cb.checked = (t.categories || []).some(c => c.type === cb.value)); 
+            document.getElementById("saveThoughtBtn").innerText = "Update Thought"; 
+            modal.style.display = 'none'; 
+            window.scrollTo(0, 0); 
+        } 
+    };
+    function editMemory(id) { 
+        const m = AppData.memories[id]; 
+        if (m) { 
+            document.getElementById('editingMemoryId').value = m.id; 
+            document.getElementById('memoryText').value = m.memoryText; 
+            document.getElementById('memoryYear').value = m.memoryYear; 
+            document.getElementById('saveMemoryBtn').innerText = 'Update Memory'; 
+        } 
+    };
+    function editItem(type, id) { 
+        const item = AppData[type][id]; 
+        if (item) { 
+            const capType = type.charAt(0).toUpperCase() + type.slice(1); 
+            document.getElementById(`editing${capType}Id`).value = item.id; 
+            document.getElementById(`${type}Text`).value = item[`${type}Text`] || item.egoText || item.habitsText; 
+            document.getElementById(`${type}Labels`).value = (item[`${type}Labels`] || item.egoLabels || item.habitsLabels || []).join(', '); 
+            document.getElementById(`save${capType}Btn`).innerText = `Update ${capType}`; 
+        } 
+    };
+    function resetThoughtForm() { 
+        document.getElementById("editingThoughtId").value = ""; 
+        document.getElementById("thoughtInput").value = ""; 
+        document.getElementById("thoughtLabels").value = ""; 
+        document.getElementById("prejudiced").checked = false; 
+        document.querySelectorAll("#categories input").forEach(cb => cb.checked = false); 
+        document.getElementById("saveThoughtBtn").innerText = "Save Thought"; 
+    };
+    function resetMemoryForm() { 
+        document.getElementById('editingMemoryId').value = ''; 
+        document.getElementById('memoryText').value = ''; 
+        document.getElementById('memoryYear').value = ''; 
+        document.getElementById('saveMemoryBtn').innerText = 'Save Memory'; 
+    };
+    function resetForm(type) { 
+        const capType = type.charAt(0).toUpperCase() + type.slice(1); 
+        document.getElementById(`editing${capType}Id`).value = ''; 
+        document.getElementById(`${type}Text`).value = ''; 
+        document.getElementById(`${type}Labels`).value = ''; 
+        document.getElementById(`save${capType}Btn`).innerText = `Save ${capType}`; 
+    };
+    function resetAllForms() { 
+        resetThoughtForm(); 
+        resetMemoryForm(); 
+        resetForm('ego'); 
+        resetForm('habits'); 
+    };
+
+    // Global UI Update
+    function updateAllViews() {
+      if (!document.getElementById('app-container') || getComputedStyle(document.getElementById('app-container')).display === 'none') return;
+      updateChart();
+      generateCalendar();
+      updateMemoryList();
+      updateEgoList();
+      updateHabitList();
+    }
+    
+    // Start the application
+    document.addEventListener("DOMContentLoaded", initializeFirebase);
+  </script>
+</body>
+</html>
+
