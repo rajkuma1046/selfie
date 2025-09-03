@@ -1,652 +1,85 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>VocabCoach — Realtime HTML (Firebase)</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <style>
-    :root{--bg:#f8fafc;--card:#fff;--muted:#6b7280;--accent:#0f172a}
-    body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial; background:var(--bg); margin:0;padding:20px;color:var(--accent)}
-    .container{max-width:1100px;margin:0 auto}
-    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-    h1{margin:0;font-size:20px}
-    .card{background:var(--card);border-radius:10px;box-shadow:0 4px 18px rgba(2,6,23,0.06);padding:14px;margin-bottom:14px}
-    .row{display:flex;gap:8px;align-items:center}
-    input[type=text], input[type=email], input[type=password], select{padding:8px;border-radius:6px;border:1px solid #e6edf3;min-width:0}
-    button{padding:8px 10px;border-radius:6px;border:none;background:#0b69ff;color:white;cursor:pointer}
-    button.ghost{background:transparent;color:var(--accent);border:1px solid #e6edf3}
-    .small{font-size:13px;padding:6px 8px}
-    .grid{display:grid;gap:10px}
-    .grid.cols-3{grid-template-columns:1fr 1fr 1fr}
-    .list-inline{display:flex;gap:6px;flex-wrap:wrap}
-    .chip{background:#eef2ff;padding:6px 8px;border-radius:999px;font-size:13px}
-    img.wordimg{max-width:100%;height:140px;object-fit:contain;border-radius:8px;border:1px solid #eef2f6}
-    pre.small{background:#0b1220;color:#dbeafe;padding:8px;border-radius:6px;overflow:auto}
-    .muted{color:var(--muted);font-size:13px}
-  </style>
-</head>
-<body>
-  <div class="container">
-    <header>
-      <h1>VocabCoach — Realtime (HTML)</h1>
-      <div id="auth-area" class="row"></div>
-    </header>
+<!DOCTYPE html>
+</div>
 
-    <!-- Lookup Card -->
-    <div class="card">
-      <div class="row">
-        <input id="word-input" type="text" placeholder="Type a word (press Enter or Lookup)" style="flex:1" />
-        <button id="lookup-btn">Lookup</button>
-        <button id="speech-pronounce" class="ghost small">🔊 Pronounce</button>
-        <button id="repeat-aud" class="ghost small">🎤 Repeat aloud</button>
-      </div>
-      <div id="lookup-result" style="margin-top:12px;display:none"></div>
-    </div>
 
-    <!-- Lists + CSV -->
-    <div class="grid cols-3">
-      <div class="card">
-        <h3>Lists</h3>
-        <div class="row" style="margin-bottom:8px">
-          <input id="new-list-name" type="text" placeholder="New list name" />
-          <button id="create-list" class="small">Create</button>
-        </div>
-        <div id="lists-container" class="grid"></div>
-        <div style="margin-top:8px">
-          <input id="csv-file" type="file" accept=".csv" />
-          <button id="import-csv" class="small">Import CSV</button>
-        </div>
-      </div>
+<div id="messages"></div>
 
-      <!-- Flashcard / Quiz -->
-      <div class="card">
-        <h3>Practice</h3>
-        <div id="flash-area" style="min-height:160px;display:flex;align-items:center;justify-content:center"></div>
-        <div style="margin-top:8px" class="row">
-          <button id="next-flash" class="small ghost">Next</button>
-          <button id="start-quiz" class="small">Start Quiz</button>
-        </div>
-        <div id="quiz-area" style="margin-top:8px"></div>
-      </div>
 
-      <!-- Progress -->
-      <div class="card">
-        <h3>Progress</h3>
-        <div id="progress-stats">No data</div>
-        <div style="margin-top:8px" class="muted">Realtime sync via Firebase Realtime Database</div>
-      </div>
-    </div>
+<script>
+// --- Firebase Config ---
+const firebaseConfig = {
+apiKey: "AIzaSyDyqLW6K7aMZudaGHRvxrceQDaANQE4c4Q",
+authDomain: "local-to-firebass.firebaseapp.com",
+databaseURL: "https://local-to-firebass-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId: "local-to-firebass",
+storageBucket: "local-to-firebass.appspot.com",
+messagingSenderId: "121890064671",
+appId: "1:121890064671:web:9143764a66282571c1c82a"
+};
 
-    <!-- Footer / Debug -->
-    <div style="height:20px"></div>
-    <div class="card">
-      <h4>Notes & Example Sentences</h4>
-      <div class="muted">Example-sentences endpoint is optional. If you deploy a serverless generator, set its URL in the 'EXAMPLES_ENDPOINT' variable below (client tries /api/generate by default).</div>
-      <pre id="debug" class="small" style="display:none"></pre>
-    </div>
-  </div>
 
-  <!-- Firebase v9 modular (ES module imports) -->
-  <script type="module">
-    // ---------- FIREBASE CONFIG ----------
-    const firebaseConfig = {
-      apiKey: "AIzaSyDyqLW6K7aMZudaGHRvxrceQDaANQE4c4Q",
-      authDomain: "local-to-firebass.firebaseapp.com",
-      databaseURL: "https://local-to-firebass-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "local-to-firebass",
-      storageBucket: "local-to-firebass.appspot.com",
-      messagingSenderId: "121890064671",
-      appId: "1:121890064671:web:9143764a66282571c1c82a"
-    };
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-    // Import Firebase modular SDK from CDN
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-    import { getDatabase, ref as dbRef, set, push, onValue, get, update, child, remove } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
-    import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
 
-    // Initialize
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const database = getDatabase(app);
-    const storage = getStorage(app);
+// Dummy dictionary API fallback for synonyms/antonyms
+async function fetchWordData(word) {
+try {
+const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+const data = await res.json();
+if (Array.isArray(data) && data[0]) {
+const meanings = data[0].meanings;
+let syns = [], ants = [];
+meanings.forEach(m => {
+m.synonyms && (syns = syns.concat(m.synonyms));
+m.antonyms && (ants = ants.concat(m.antonyms));
+});
+return {
+word: data[0].word,
+meaning: meanings[0]?.definitions[0]?.definition || "No definition found",
+synonyms: [...new Set(syns)].slice(0, 5),
+antonyms: [...new Set(ants)].slice(0, 5)
+};
+}
+} catch (e) {
+console.error("Error fetching word data", e);
+}
+return { word, meaning: "Not found", synonyms: [], antonyms: [] };
+}
 
-    // ---------- DOM ----------
-    const authArea = document.getElementById('auth-area');
-    const debugEl = document.getElementById('debug');
-    const wordInput = document.getElementById('word-input');
-    const lookupBtn = document.getElementById('lookup-btn');
-    const lookupResult = document.getElementById('lookup-result');
-    const speechPronounce = document.getElementById('speech-pronounce');
-    const repeatAudBtn = document.getElementById('repeat-aud');
-    const listsContainer = document.getElementById('lists-container');
-    const createListBtn = document.getElementById('create-list');
-    const newListName = document.getElementById('new-list-name');
-    const csvFileInput = document.getElementById('csv-file');
-    const importCsvBtn = document.getElementById('import-csv');
-    const flashArea = document.getElementById('flash-area');
-    const nextFlashBtn = document.getElementById('next-flash');
-    const startQuizBtn = document.getElementById('start-quiz');
-    const quizArea = document.getElementById('quiz-area');
-    const progressStats = document.getElementById('progress-stats');
 
-    // Optional: serverless endpoint for example sentences (deploy and update)
-    const EXAMPLES_ENDPOINT = '/api/generate'; // change if you host a serverless function
+// Save word to realtime database
+async function saveWord() {
+const word = document.getElementById("wordInput").value.trim();
+if (!word) return alert("Enter a word");
+const data = await fetchWordData(word);
+db.ref("words").push({ ...data, time: Date.now() });
+document.getElementById("wordInput").value = "";
+}
 
-    // ---------- App state ----------
-    let currentUser = null;
-    let localWords = {}; // local cached words for logged in user (mirrors DB)
-    let localLists = {}; // lists metadata
-    let flashQueue = [];
-    let flashIndex = 0;
-    let quizObj = null;
-    let repeatSpokenCount = 0;
-    let speechRec = null;
 
-    // ---------- Helper utilities ----------
-    function logDebug(...args) { console.log(...args); debugEl.style.display='block'; debugEl.textContent = debugEl.textContent + '\\n' + args.map(a=>String(a)).join(' '); }
-    function el(tag, attrs={}, txt=''){ const e = document.createElement(tag); for(const k in attrs) e.setAttribute(k, attrs[k]); if(txt) e.textContent = txt; return e; }
-    function toSafeKey(s){ return s.trim().toLowerCase().replace(/\\s+/g,'_'); }
-
-    // Minimal dictionary + translation
-    async function fetchDefinitions(word){
-      const url = `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`;
-      const r = await fetch(url);
-      if(!r.ok) throw new Error('Definition not found');
-      const j = await r.json();
-      const entry = j[0];
-      const meanings = entry.meanings || [];
-      const phonetic = entry.phonetic || (entry.phonetics && entry.phonetics[0] && entry.phonetics[0].text) || '';
-      const defs = []; const syn = new Set(); const ant = new Set();
-      meanings.forEach(m=>{
-        (m.definitions||[]).forEach(d=>{
-          if(d.definition) defs.push({pos: m.partOfSpeech, definition: d.definition});
-          (d.synonyms||[]).forEach(s=>syn.add(s));
-          (d.antonyms||[]).forEach(a=>ant.add(a));
-        });
-        (m.synonyms||[]).forEach(s=>syn.add(s));
-        (m.antonyms||[]).forEach(a=>ant.add(a));
-      });
-      return { word: entry.word, phonetic, definitions: defs.slice(0,6), synonyms: Array.from(syn).slice(0,10), antonyms: Array.from(ant).slice(0,10) };
-    }
-
-    async function translateToHindi(text){
-      try{
-        const res = await fetch('https://libretranslate.de/translate', {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ q:text, source:'en', target:'hi', format:'text' })
-        });
-        if(!res.ok) return '';
-        const j = await res.json();
-        return j.translatedText || '';
-      }catch(e){ return ''; }
-    }
-
-    // Image generation (canvas). Returns Blob <= maxBytes if possible
-    async function generateMeaningImage({ word, hint, width=512, height=320, maxBytes=100*1024 }){
-      const canvas = document.createElement('canvas');
-      canvas.width = width; canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      const grad = ctx.createLinearGradient(0,0,width,height);
-      grad.addColorStop(0,'#f1f5f9'); grad.addColorStop(1,'#e2e8f0');
-      ctx.fillStyle=grad; ctx.fillRect(0,0,width,height);
-      ctx.font='96px system-ui, sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillStyle='#0f172a';
-      ctx.fillText('🧠', width/2, height/2-40);
-      ctx.font='bold 36px system-ui, sans-serif'; ctx.fillText(word, width/2, height/2+20);
-      ctx.font='18px system-ui, sans-serif'; ctx.fillStyle='#334155';
-      ctx.fillText((hint||'').slice(0,60), width/2, height-40);
-      let quality=0.8;
-      for(let i=0;i<6;i++){
-        const blob = await new Promise(res=>canvas.toBlob(res,'image/webp',quality));
-        if(!blob) break;
-        if(blob.size <= maxBytes) return blob;
-        quality -= 0.12;
-      }
-      return await new Promise(res=>canvas.toBlob(res,'image/jpeg',0.6));
-    }
-
-    async function uploadWordImageIfMissing(uid, word, blob){
-      if(!currentUser) return null;
-      const key = `word-images/${uid}/${toSafeKey(word)}.webp`;
-      const ref = sRef(storage, key);
-      try{
-        const url = await getDownloadURL(ref);
-        return url;
-      }catch(e){
-        const up = await uploadBytes(ref, blob, { contentType: blob.type || 'image/webp' });
-        const url = await getDownloadURL(up.ref);
-        return url;
-      }
-    }
-
-    // ---------- Auth UI and listeners ----------
-    function renderAuthUI(user){
-      authArea.innerHTML = '';
-      if(user){
-        const badge = el('div',{}, user.email||user.uid);
-        const outBtn = el('button',{}, 'Sign out');
-        outBtn.onclick = async ()=> { await signOut(auth); };
-        authArea.appendChild(badge); authArea.appendChild(outBtn);
-      } else {
-        const email = el('input',{type:'email', placeholder:'email'});
-        const pass = el('input',{type:'password', placeholder:'password'});
-        const inBtn = el('button',{}, 'Sign in');
-        const upBtn = el('button',{}, 'Sign up');
-        inBtn.onclick = async ()=>{
-          try{ await signInWithEmailAndPassword(auth, email.value, pass.value); }catch(e){ alert(e.message); }
-        };
-        upBtn.onclick = async ()=>{
-          try{ await createUserWithEmailAndPassword(auth, email.value, pass.value); }catch(e){ alert(e.message); }
-        };
-        authArea.appendChild(email); authArea.appendChild(pass); authArea.appendChild(inBtn); authArea.appendChild(upBtn);
-      }
-    }
-
-    onAuthStateChanged(auth, user=>{
-      currentUser = user;
-      renderAuthUI(user);
-      if(user){
-        // start realtime listeners for this user's words and lists
-        startRealtimeListeners(user.uid);
-      }else{
-        // clear state
-        localWords = {}; localLists = {}; flashQueue=[]; flashIndex=0;
-        listsContainer.innerHTML=''; flashArea.innerHTML=''; progressStats.textContent='Signed out';
-        // detach listeners by reloading page or letting them continue (for simplicity, we won't detach here)
-      }
-    });
-
-    // ---------- Realtime DB listeners & operations ----------
-    function startRealtimeListeners(uid){
-      // words
-      const wordsRef = dbRef(database, `users/${uid}/words`);
-      onValue(wordsRef, snapshot=>{
-        const val = snapshot.val() || {};
-        localWords = val;
-        // update lists view, progress, flash queue
-        renderLists(); computeProgress();
-      });
-      // lists
-      const listsRef = dbRef(database, `users/${uid}/lists`);
-      onValue(listsRef, snap=>{
-        localLists = snap.val() || {};
-        renderLists();
-      });
-    }
-
-    async function saveWordToDb(wordObj){
-      if(!currentUser) { alert('Sign in to save words'); return; }
-      const uid = currentUser.uid;
-      const key = toSafeKey(wordObj.word);
-      const ref = dbRef(database, `users/${uid}/words/${key}`);
-      // ensure small fields are stored
-      const payload = {
-        word: wordObj.word,
-        phonetic: wordObj.phonetic||'',
-        definitions: wordObj.definitions||[],
-        synonyms: wordObj.synonyms||[],
-        antonyms: wordObj.antonyms||[],
-        hindi: wordObj.hindi||'',
-        imageUrl: wordObj.imageUrl||'',
-        repeatsCompleted: wordObj.repeatsCompleted||0,
-        nextReviewAt: wordObj.nextReviewAt||Date.now(),
-        createdAt: Date.now(),
-        lists: wordObj.lists||{}
-      };
-      await set(ref, payload);
-    }
-
-    async function createListDb(name){
-      if(!currentUser) { alert('Sign in to create lists'); return; }
-      const uid = currentUser.uid;
-      const listsRef = dbRef(database, `users/${uid}/lists`);
-      const newListRef = push(listsRef);
-      await set(newListRef, { id: newListRef.key, name, size: 0, createdAt: Date.now() });
-    }
-
-    async function addWordToListDb(word, listId){
-      if(!currentUser) { alert('Sign in'); return; }
-      const uid = currentUser.uid;
-      const wordKey = toSafeKey(word);
-      const wRef = dbRef(database, `users/${uid}/words/${wordKey}/lists/${listId}`);
-      await set(wRef, true);
-      // atomically increment list size (simple read/then write)
-      const lRef = dbRef(database, `users/${uid}/lists/${listId}/size`);
-      const snap = await get(lRef);
-      const current = snap.exists() ? snap.val() : 0;
-      await set(lRef, current+1);
-    }
-
-    // Update repeats
-    async function markRepeatDb(wordKey, known=false){
-      if(!currentUser) return;
-      const uid = currentUser.uid;
-      const ref = dbRef(database, `users/${uid}/words/${wordKey}/repeatsCompleted`);
-      const snap = await get(ref);
-      let rc = snap.exists() ? snap.val() : 0;
-      if(known) rc = Math.max(rc,10); else rc = rc + 1;
-      await set(ref, rc);
-      // update nextReviewAt
-      const nextAt = Date.now() + nextIntervalMs(rc);
-      await set(dbRef(database, `users/${uid}/words/${wordKey}/nextReviewAt`), nextAt);
-    }
-
-    // ---------- UI rendering ----------
-    function renderLookup(wordData){
-      lookupResult.style.display='block';
-      lookupResult.innerHTML='';
-      const container = el('div');
-      const title = el('div', {}, `${wordData.word} ${wordData.phonetic ? '('+wordData.phonetic+')' : ''}`);
-      title.style.fontWeight='bold';
-      const hi = el('div', {}, 'Hindi: ' + (wordData.hindi || '—')); hi.className='muted';
-      container.appendChild(title); container.appendChild(hi);
-
-      // definitions
-      const ol = el('ol');
-      (wordData.definitions || []).forEach(d=>{
-        const li = el('li',{}, d.definition + (d.pos ? ` (${d.pos})` : ''));
-        ol.appendChild(li);
-      });
-      container.appendChild(ol);
-
-      // synonyms / antonyms
-      const synBar = el('div',{}, 'Synonyms: '); synBar.className='list-inline';
-      (wordData.synonyms||[]).slice(0,8).forEach(s=>{ const c=el('span',{class:'chip'}, s); c.onclick=()=> { wordInput.value=s; handleLookup(); }; synBar.appendChild(c);});
-      container.appendChild(synBar);
-      const antBar = el('div',{}, 'Antonyms: '); antBar.className='list-inline';
-      (wordData.antonyms||[]).slice(0,8).forEach(a=>{ const c=el('span',{class:'chip'}, a); c.onclick=()=> { wordInput.value=a; handleLookup(); }; antBar.appendChild(c);});
-      container.appendChild(antBar);
-
-      // image
-      if(wordData.imageUrl){
-        const img = el('img',{class:'wordimg'}); img.src = wordData.imageUrl; container.appendChild(img);
-      } else {
-        const note = el('div',{}, '(Sign in to auto-generate and cache a lightweight image ≤100KB)');
-        note.className='muted'; container.appendChild(note);
-      }
-
-      // actions: save, repeat, know
-      const actions = el('div'); actions.style.marginTop='8px';
-      const saveBtn = el('button',{}, 'Save word'); saveBtn.onclick = async ()=>{
-        // try to generate and upload image if signed in
-        let url = '';
-        if(currentUser){
-          try{
-            const blob = await generateMeaningImage({ word: wordData.word, hint: wordData.definitions?.[0]?.definition||'' });
-            if(blob && blob.size <= 100*1024){
-              url = await uploadWordImageIfMissing(currentUser.uid, wordData.word, blob);
-            }
-          }catch(e){ console.warn(e); }
-        }
-        await saveWordToDb({ ...wordData, imageUrl: url });
-        alert('Saved');
-      };
-      const repeatBtn = el('button',{class:'ghost small'}, 'Repeat x1');
-      repeatBtn.onclick = async ()=>{
-        if(!currentUser){ alert('Sign in'); return; }
-        const key = toSafeKey(wordData.word);
-        await markRepeatDb(key,false);
-        alert('Marked one repeat for '+wordData.word);
-      };
-      const knowBtn = el('button',{class:'small'}, 'I know this');
-      knowBtn.onclick = async ()=>{
-        if(!currentUser){ alert('Sign in'); return; }
-        const key = toSafeKey(wordData.word);
-        await markRepeatDb(key,true);
-        alert('Marked as known (10/10)');
-      };
-
-      actions.appendChild(saveBtn); actions.appendChild(repeatBtn); actions.appendChild(knowBtn);
-      container.appendChild(actions);
-
-      // example sentences area + button
-      const exampleBtn = el('button',{class:'small ghost'}, 'Generate examples');
-      exampleBtn.onclick = async ()=>{
-        const sentences = await fetchExampleSentences(wordData.word, 5);
-        if(sentences && sentences.length){
-          alert('Examples:\\n' + sentences.join('\\n'));
-        } else {
-          alert('No examples (endpoint missing or blocked).');
-        }
-      };
-      container.appendChild(exampleBtn);
-
-      lookupResult.appendChild(container);
-    }
-
-    function renderLists(){
-      listsContainer.innerHTML='';
-      // show existing lists
-      for(const id in localLists){
-        const li = localLists[id];
-        const card = el('div'); card.className='card'; card.style.marginBottom='6px';
-        const title = el('div',{}, li.name + ` (${li.size || 0})`); title.style.fontWeight='600';
-        const addCur = el('button',{}, 'Add current word');
-        addCur.onclick = async ()=>{
-          const w = (window.lastLookup && window.lastLookup.word) ? window.lastLookup.word : wordInput.value.trim();
-          if(!w){ alert('No word'); return; }
-          await addWordToListDb(w, id);
-          alert('Added');
-        };
-        const exportBtn = el('button',{class:'small ghost'}, 'Export CSV');
-        exportBtn.onclick = async ()=>{
-          await exportListCsv(id, li.name);
-        };
-        card.appendChild(title); card.appendChild(addCur); card.appendChild(exportBtn);
-        listsContainer.appendChild(card);
-      }
-    }
-
-    // ---------- Flashcards & Quiz ----------
-    function updateFlashQueue(){
-      flashQueue = Object.values(localWords || {}).map(w=>({word:w.word, def: (w.definitions && w.definitions[0] && w.definitions[0].definition) || ''}));
-      flashIndex = 0;
-      showFlash();
-    }
-    function showFlash(){
-      flashArea.innerHTML='';
-      if(!flashQueue.length){ flashArea.textContent='No saved words'; return; }
-      const item = flashQueue[flashIndex % flashQueue.length];
-      const front = el('div',{}, item.word); front.style.fontWeight='700'; front.style.fontSize='22px';
-      const back = el('div',{}, item.def);
-      const card = el('div'); card.style.textAlign='center'; card.style.padding='18px';
-      card.appendChild(front); card.appendChild(back);
-      flashArea.appendChild(card);
-    }
-    nextFlashBtn.onclick = ()=>{ flashIndex++; showFlash(); };
-
-    // Quiz generator (simple MCQ)
-    startQuizBtn.onclick = async ()=>{
-      const items = Object.values(localWords || {});
-      if(items.length < 4){ alert('Add at least 4 words to DB to take a quiz'); return; }
-      quizObj = { questions: [] };
-      const n = Math.min(10, items.length);
-      for(let i=0;i<n;i++){
-        const target = items[Math.floor(Math.random()*items.length)];
-        const correct = target.definitions && target.definitions[0] && target.definitions[0].definition || '';
-        const opts = new Set([correct]);
-        while(opts.size < 4){
-          const pick = items[Math.floor(Math.random()*items.length)];
-          const d = pick.definitions && pick.definitions[0] && pick.definitions[0].definition || '';
-          if(d && d !== correct) opts.add(d);
-        }
-        const shuffled = Array.from(opts).sort(()=>Math.random()-0.5);
-        quizObj.questions.push({ word: target.word, options: shuffled, answer: correct });
-      }
-      quizObj.index = 0; quizObj.score = 0;
-      renderQuiz();
-    };
-
-    function renderQuiz(){
-      quizArea.innerHTML='';
-      if(!quizObj) return;
-      const q = quizObj.questions[quizObj.index];
-      const qText = el('div',{}, `Q${quizObj.index+1}. Which definition best fits "${q.word}"?`);
-      quizArea.appendChild(qText);
-      q.options.forEach(o=>{
-        const b = el('button',{}, o);
-        b.onclick = ()=>{
-          if(o === q.answer) quizObj.score++;
-          quizObj.index++;
-          if(quizObj.index >= quizObj.questions.length){
-            alert(`Quiz complete! Score: ${quizObj.score} / ${quizObj.questions.length}`);
-            quizObj = null; quizArea.innerHTML=''; computeProgress();
-          } else renderQuiz();
-        };
-        quizArea.appendChild(b);
-      });
-    }
-
-    // ---------- CSV export/import ----------
-    async function exportListCsv(listId, listName){
-      const words = [];
-      for(const key in localWords){
-        const w = localWords[key];
-        // include only words that have this list set
-        if(w.lists && w.lists[listId]){
-          words.push(w);
-        }
-      }
-      if(!words.length){ alert('No words in that list'); return; }
-      const header = ['word','phonetic','definitions','synonyms','antonyms','hindi'].join(',');
-      const rows = words.map(w=>{
-        const defs = (w.definitions||[]).map(d=>d.definition.replace(/\\n/g,' ')).join(' | ');
-        const syn = (w.synonyms||[]).join('|');
-        const ant = (w.antonyms||[]).join('|');
-        return `${w.word},${w.phonetic || ''},"${defs}","${syn}","${ant}","${w.hindi || ''}"`;
-      });
-      const csv = [header,...rows].join('\\n');
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = `${listName||'vocab-list'}.csv`; a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    async function importListsFromCsv(file){
-      if(!currentUser){ alert('Sign in to import'); return; }
-      const txt = await file.text();
-      const lines = txt.split(/\\r?\\n/).filter(Boolean);
-      if(lines.length <= 1){ alert('No rows'); return; }
-      const rows = lines.slice(1);
-      for(const r of rows){
-        const parts = r.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/);
-        const word = parts[0];
-        const phonetic = parts[1] || '';
-        const defs = (parts[2] || '').replace(/^"|"$/g,'').split(' | ').map(s=>({definition:s}));
-        const syn = (parts[3] || '').replace(/^"|"$/g,'').split('|').filter(Boolean);
-        const ant = (parts[4] || '').replace(/^"|"$/g,'').split('|').filter(Boolean);
-        const hindi = (parts[5] || '').replace(/^"|"$/g,'') || '';
-        await saveWordToDb({ word, phonetic, definitions:defs, synonyms:syn, antonyms:ant, hindi, repeatsCompleted:0, nextReviewAt:Date.now(), imageUrl:'' });
-      }
-      alert('Import done');
-    }
-
-    importCsvBtn.onclick = ()=>{ const f = csvFileInput.files[0]; if(f) importListsFromCsv(f); else alert('Pick a CSV'); };
-
-    // ---------- Speech (pronounce + repeat tracking) ----------
-    speechPronounce.onclick = ()=>{
-      const text = (window.lastLookup && window.lastLookup.word) ? window.lastLookup.word : (wordInput.value || '');
-      if(!text) return alert('No word to pronounce');
-      if('speechSynthesis' in window){
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = 'en-US'; u.rate = 0.95;
-        window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);
-      } else alert('TTS not supported in this browser');
-    };
-
-    repeatAudBtn.onclick = ()=>{
-      const target = (window.lastLookup && window.lastLookup.word) ? window.lastLookup.word : (wordInput.value || '');
-      if(!target) return alert('No target word');
-      repeatSpokenCount = 0;
-      alert('When ready: speak the word out loud clearly. App will count repeats containing the word.');
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if(!SpeechRecognition) return alert('SpeechRecognition not supported');
-      speechRec = new SpeechRecognition();
-      speechRec.lang = 'en-US'; speechRec.interimResults = false; speechRec.maxAlternatives = 1;
-      speechRec.onresult = (evt)=>{
-        const t = evt.results[0][0].transcript || '';
-        if(t.toLowerCase().includes(target.toLowerCase())){
-          repeatSpokenCount = Math.min(10, repeatSpokenCount + 1);
-          alert(`Detected "${t}" — count ${repeatSpokenCount}/10`);
-          // optionally update DB record when hits 10
-          if(repeatSpokenCount >= 10 && currentUser){
-            const key = toSafeKey(target);
-            markRepeatDb(key, false);
-            alert('Recorded 10 spoken repeats and updated progress.');
-            speechRec.stop();
-          }
-        } else {
-          alert('Heard: ' + t);
-        }
-      };
-      speechRec.onend = ()=>{ /* ended */ };
-      speechRec.start();
-    };
-
-    // ---------- Example sentences (serverless) ----------
-    async function fetchExampleSentences(word, count=5){
-      try{
-        if(!currentUser) return [];
-        const idToken = await currentUser.getIdToken(true);
-        const res = await fetch(EXAMPLES_ENDPOINT, {
-          method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization': 'Bearer '+idToken },
-          body: JSON.stringify({ word, count })
-        });
-        if(!res.ok) return [];
-        const j = await res.json();
-        return j.sentences || [];
-      }catch(e){ console.warn('examples failed', e); return []; }
-    }
-
-    // ---------- Lookup handler ----------
-    lookupBtn.onclick = handleLookup;
-    wordInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') handleLookup(); });
-
-    async function handleLookup(){
-      const w = wordInput.value.trim();
-      if(!w) return alert('Type a word');
-      lookupResult.style.display='none';
-      lookupResult.innerHTML='Loading...';
-      try{
-        const def = await fetchDefinitions(w);
-        def.hindi = await translateToHindi(def.definitions && def.definitions[0] && def.definitions[0].definition || w);
-        window.lastLookup = def;
-        renderLookup(def);
-      }catch(e){
-        lookupResult.style.display='block';
-        lookupResult.innerHTML = '<div class="muted">Lookup failed: ' + (e.message||e) + '</div>';
-      }
-    }
-
-    // Create list
-    createListBtn.onclick = async ()=>{
-      const name = newListName.value.trim();
-      if(!name) return alert('Name required');
-      await createListDb(name);
-      newListName.value='';
-    };
-
-    // When localWords updates, refresh flash queue and progress
-    function computeProgress(){
-      const words = Object.values(localWords || {});
-      const learned = words.filter(w => (w.repeatsCompleted || 0) >= 10).length;
-      const createdAt = currentUser ? (localLists._meta && localLists._meta.createdAt ? localLists._meta.createdAt : Date.now()) : Date.now();
-      const days = Math.max(1, Math.ceil((Date.now() - createdAt) / (24*60*60*1000)));
-      const wpd = (learned / days).toFixed(2);
-      progressStats.textContent = `Words saved: ${words.length} — Learned (10/10): ${learned} — ${wpd} words/day`;
-      updateFlashQueue();
-    }
-
-    // Spaced repetition schedule
-    function nextIntervalMs(repeatIndex){
-      const schedule = [0, 10*60e3, 60*60e3, 12*60*60e3, 24*60*60e3, 2*24*60*60e3, 4*24*60*60e3, 7*24*60*60e3, 14*24*60*60e3, 30*24*60*60e3];
-      return schedule[Math.min(repeatIndex, schedule.length-1)];
-    }
-
-    // ---------- end module ----------
-    // initial UI
-    renderAuthUI(null);
-  </script>
+// Listen for changes in real-time
+const wordsRef = db.ref("words");
+wordsRef.on("value", (snapshot) => {
+const data = snapshot.val();
+const container = document.getElementById("messages");
+container.innerHTML = "";
+for (let id in data) {
+const item = data[id];
+const div = document.createElement("div");
+div.className = "card";
+div.innerHTML = `
+<div class="word">${item.word}</div>
+<div class="meaning">Meaning: ${item.meaning}</div>
+<div class="section-title">Synonyms:</div>
+<div>${item.synonyms && item.synonyms.length ? item.synonyms.join(", ") : "None"}</div>
+<div class="section-title">Antonyms:</div>
+<div>${item.antonyms && item.antonyms.length ? item.antonyms.join(", ") : "None"}</div>
+`;
+container.appendChild(div);
+}
+});
+</script>
 </body>
 </html>
