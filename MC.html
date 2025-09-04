@@ -2,221 +2,553 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Mock Assessment App</title>
-  <!-- Tailwind CSS (for local dev only) -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mock Test Marks Analysis — Firebase Sync (with Toasts)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #f5f8fb;
+      margin: 0;
+      padding: 18px;
+    }
+    .container { width: 100%; max-width: 1100px; }
+    header { width: 100%; display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px; }
+    h1 { margin: 0; color: #1f2937; font-size: 22px; }
+    .auth { display:flex; gap:8px; align-items:center; }
+    .auth input { padding:8px; border-radius:6px; border:1px solid #d1d5db; }
+    .auth button { padding:8px 10px; border-radius:6px; border:none; background:#0b69ff; color:#fff; cursor:pointer; }
+    .card { background:#fff; border-radius:10px; padding:14px; margin-bottom:14px; box-shadow:0 6px 18px rgba(16,24,40,0.06); }
+    .chart-container { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-between; }
+    canvas { width:100% !important; max-width:540px; height:auto !important; border-radius:10px; box-shadow: 1px 1px 6px rgba(16,24,40,0.06); }
+    .input-container { margin-top:10px; display:flex; flex-direction:column; align-items:center; gap:8px; }
+    input[type=number], textarea { margin: 5px; font-size: 15px; box-shadow: .5px 1px 8px rgba(0,0,0,0.06); color: #111827; padding: 8px; font-weight: 600; border-radius: 8px; border:1px solid #e6edf3; width:220px; }
+    .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .save, .clear { padding:10px 12px; border-radius:8px; font-weight:700; color:#fff; cursor:pointer; border:none; }
+    .save { background: rgb(21, 174, 44); }
+    .clear { background: rgb(138, 2, 2); }
+    .average { padding:8px; border-radius:8px; color:#fff; font-weight:600; margin-top:6px; }
+    #tier1Average { background: rgb(8, 99, 174); }
+    #tier2Average { background: rgb(0, 0, 128); }
+    .export-import { margin-top: 14px; text-align:center; display:flex; gap:8px; align-items:center; justify-content:center; flex-wrap:wrap; }
+    .export-import button { padding:8px 10px; border-radius:8px; border:none; color:#fff; font-weight:700; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.08); }
+    #exportAll { background-color: rgb(0, 102, 204); }
+    #backupFirebase { background-color: rgb(16, 185, 129); } /* emerald */
+    #restoreFirebase { background-color: rgb(249, 115, 22); } /* orange */
+    #importFile { margin-top:6px; }
+    .muted { color:#6b7280; font-size:13px; }
 
-  <!-- React & ReactDOM -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <!-- Recharts UMD -->
-  <script src="https://unpkg.com/recharts/umd/Recharts.min.js"></script>
-</head>
+    /* Toast styles */
+    #toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 99999;
+    }
+    .toast {
+      min-width: 220px;
+      max-width: 360px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.15);
+      opacity: 0;
+      transform: translateY(-8px);
+      animation: toastIn 0.28s ease forwards;
+    }
+    .toast.success { background: linear-gradient(90deg,#16a34a,#059669); }
+    .toast.error { background: linear-gradient(90deg,#dc2626,#ef4444); }
+    .toast.info { background: linear-gradient(90deg,#0ea5e9,#0284c7); }
 
-<body class="bg-gray-100 text-gray-800">
-  <div id="root" class="min-h-screen p-6"></div>
-
-  <script>
-    // pull in React & Recharts globals
-    const { useState, useEffect } = React;
-    const {
-      PieChart, Pie, Cell, Tooltip, ResponsiveContainer
-    } = Recharts;
-
-    const SECTIONS = ['Maths', 'Reasoning', 'English', 'GK'];
-    const TAGS = { unt: 'Unattempted', over: 'Over Time', wrong: 'Wrong' };
-    const COLORS = { unt: '#facc15', over: '#60a5fa', wrong: '#f87171' };
-
-    function App() {
-      const [mocks, setMocks] = useState(() => JSON.parse(localStorage.getItem('mocks') || '[]'));
-      const [newMock, setNewMock] = useState({
-        number: mocks.length + 1,
-        score: 0,
-        sections: SECTIONS.reduce((a,s)=>(a[s]=[],a), {})
-      });
-
-      useEffect(() => {
-        localStorage.setItem('mocks', JSON.stringify(mocks));
-      }, [mocks]);
-
-      const exportJSON = () => {
-        const blob = new Blob([JSON.stringify(mocks, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = 'mocks.json'; a.click();
-      };
-
-      const importJSON = e => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-          try {
-            const data = JSON.parse(reader.result);
-            setMocks(data);
-            setNewMock(m => ({ ...m, number: data.length + 1 }));
-          } catch {
-            alert('Invalid JSON');
-          }
-        };
-        reader.readAsText(file);
-      };
-
-      const addTopic = sec => {
-        const text = document.getElementById(`${sec}-topic`).value.trim();
-        const tag  = document.getElementById(`${sec}-tag`).value;
-        if (!text) return;
-        setNewMock(m => ({
-          ...m,
-          sections: {
-            ...m.sections,
-            [sec]: [...m.sections[sec], { text, tag }]
-          }
-        }));
-        document.getElementById(`${sec}-topic`).value = '';
-      };
-
-      const saveMock = () => {
-        setMocks([...mocks, newMock]);
-        setNewMock({
-          number: newMock.number + 1,
-          score: 0,
-          sections: SECTIONS.reduce((a,s)=>(a[s]=[],a), {})
-        });
-      };
-
-      const combined = SECTIONS.reduce((acc,sec) => {
-        const all = mocks.flatMap(m=>m.sections[sec]);
-        const freq = {};
-        all.forEach(({text,tag}) => {
-          const k = text.toLowerCase();
-          if (!freq[k]) freq[k] = { text, tag, count: 0 };
-          freq[k].count++;
-        });
-        acc[sec] = Object.values(freq).sort((a,b)=>b.count-a.count);
-        return acc;
-      }, {});
-
-      const avgScore = mocks.length
-        ? Math.round(mocks.reduce((sum,m)=>sum+m.score,0)/mocks.length)
-        : 0;
-
-      return React.createElement('div', { className:'space-y-6' },
-
-        // Header + Export/Import
-        React.createElement('div', { className:'flex justify-between items-center' },
-          React.createElement('h1',{className:'text-2xl font-bold'},'Mock Assessment'),
-          React.createElement('div',null,
-            React.createElement('button',{
-              onClick:exportJSON,
-              className:'mr-2 px-4 py-2 bg-green-600 text-white rounded'
-            },'Export'),
-            React.createElement('label',{className:'px-4 py-2 bg-yellow-500 text-white rounded cursor-pointer'},
-              'Import',
-              React.createElement('input',{
-                type:'file', accept:'.json', className:'hidden', onChange:importJSON
-              })
-            )
-          )
-        ),
-
-        // New Mock Form
-        React.createElement('div',{className:'bg-white p-4 rounded shadow space-y-4'},
-          React.createElement('h2',{className:'font-semibold'},`Add Mock No. ${newMock.number}`),
-          React.createElement('div',{className:'flex items-center'},
-            'Score:',
-            React.createElement('input',{
-              type:'number', min:0, max:200, value:newMock.score,
-              onChange:e=>setNewMock({...newMock,score:+e.target.value}),
-              className:'ml-2 border p-1 rounded w-20'
-            })
-          ),
-          SECTIONS.map(sec =>
-            React.createElement('div',{key:sec,className:'flex items-center space-x-2'},
-              React.createElement('strong',null,sec),
-              React.createElement('input',{
-                id:`${sec}-topic`,type:'text',placeholder:'Topic',
-                className:'border p-1 rounded flex-1'
-              }),
-              React.createElement('select',{
-                id:`${sec}-tag`,className:'border p-1 rounded'
-              },
-                React.createElement('option',{value:'unt'},'Unattempted'),
-                React.createElement('option',{value:'over'},'Over Time'),
-                React.createElement('option',{value:'wrong'},'Wrong')
-              ),
-              React.createElement('button',{
-                onClick:()=>addTopic(sec),
-                className:'px-3 py-1 bg-blue-600 text-white rounded'
-              },'Add')
-            )
-          ),
-          React.createElement('button',{
-            onClick:saveMock,
-            className:'mt-2 px-4 py-2 bg-indigo-600 text-white rounded'
-          },'Save Mock')
-        ),
-
-        // Saved mocks
-        mocks.map(m =>
-          React.createElement('div',{key:m.number,className:'bg-white p-4 rounded shadow space-y-2'},
-            React.createElement('div',{className:'flex justify-between'},
-              React.createElement('h3',{className:'font-bold'},`Mock No. ${m.number}`),
-              React.createElement('span',null,`Score: ${m.score}/200`)
-            ),
-            React.createElement('div',{className:'grid grid-cols-4 gap-4'},
-              SECTIONS.map(sec =>
-                React.createElement('div',{key:sec,className:'border p-2 rounded max-h-48 overflow-y-auto'},
-                  React.createElement('h4',{className:'font-semibold mb-1'},sec),
-                  m.sections[sec].map((t,i)=>
-                    React.createElement('div',{key:i,style:{background:COLORS[t.tag]},className:'text-sm mb-1 p-1 rounded'},
-                      `[${TAGS[t.tag]}] ${t.text}`
-                    )
-                  )
-                )
-              )
-            )
-          )
-        ),
-
-        // Combined Summary
-        React.createElement('div',{className:'bg-white p-4 rounded shadow space-y-4'},
-          React.createElement('div',{className:'flex justify-between'},
-            React.createElement('h2',{className:'font-bold'},'Mock Combination'),
-            React.createElement('span',null,`Avg Score: ${avgScore}/200`)
-          ),
-          React.createElement('div',{className:'grid grid-cols-4 gap-4'},
-            SECTIONS.map(sec =>
-              React.createElement('div',{key:sec,className:'border p-2 rounded flex flex-col items-center'},
-                React.createElement('h4',{className:'font-semibold mb-2'},sec),
-                React.createElement(ResponsiveContainer,{width:'100%',height:120},
-                  React.createElement(PieChart,null,
-                    React.createElement(Pie,{
-                      data:Object.entries(TAGS).map(([k,name])=>({
-                        name, value: combined[sec].filter(x=>x.tag===k).reduce((s,x)=>s+x.count,0)
-                      })),
-                      dataKey:'value',innerRadius:20,outerRadius:40
-                    },
-                      Object.keys(TAGS).map(k=>
-                        React.createElement(Cell,{key:k,fill:COLORS[k]})
-                      )
-                    ),
-                    React.createElement(Tooltip,null)
-                  )
-                ),
-                React.createElement('div',{className:'mt-2 text-sm'},
-                  combined[sec].map((x,i)=>
-                    React.createElement('div',{key:i},`[${TAGS[x.tag]}] ${x.text} (${x.count})`)
-                  )
-                )
-              )
-            )
-          )
-        )
-      );
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(-8px) translateX(8px); }
+      to { opacity: 1; transform: translateY(0) translateX(0); }
     }
 
-    ReactDOM.render(React.createElement(App), document.getElementById('root'));
+    .toast.hide {
+      animation: toastOut 0.38s ease forwards;
+    }
+    @keyframes toastOut {
+      to { opacity: 0; transform: translateY(-12px) translateX(8px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Mock Test Marks Analysis</h1>
+
+      <div class="auth card" style="padding:10px;">
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div class="row">
+            <input id="authEmail" type="email" placeholder="email" />
+            <input id="authPassword" type="password" placeholder="password" />
+            <button id="signInBtn">Sign in</button>
+            <button id="signUpBtn">Sign up</button>
+            <button id="signOutBtn" style="display:none;background:#ef4444">Sign out</button>
+          </div>
+          <div class="row" style="align-items:center;">
+            <div id="signedInInfo" class="muted">Not signed in</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="card export-import">
+      <div>
+        <h3>Backup & Restore</h3>
+        <div class="row">
+          <button id="exportAll">Export All</button>
+          <button id="backupFirebase">Backup to Firebase</button>
+          <button id="restoreFirebase">Restore from Firebase</button>
+          <input type="file" id="importFile" accept=".json" onchange="importData(event)" />
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-container">
+      <div class="card" style="flex:1; min-width:320px; max-width:540px;">
+        <h2>Tier 1 Mock Test (200)</h2>
+        <canvas id="tier1Chart"></canvas>
+        <div class="input-container">
+          <input type="number" id="tier1Marks" placeholder="Tier 1 Marks" max="200" />
+          <textarea id="tier1Comment" rows="2" placeholder="Comment"></textarea>
+          <div class="row">
+            <button class="save" onclick="saveTier1()">Save Tier 1</button>
+            <button class="clear" onclick="resetTier1()">Reset Tier 1</button>
+          </div>
+          <div class="average" id="tier1Average">Average Marks: 0</div>
+        </div>
+      </div>
+
+      <div class="card" style="flex:1; min-width:320px; max-width:540px;">
+        <h2>Tier 2 Mock Test (390)</h2>
+        <canvas id="tier2Chart"></canvas>
+        <div class="input-container">
+          <input type="number" id="tier2Marks" placeholder="Tier 2 Marks" max="390" />
+          <textarea id="tier2Comment" rows="2" placeholder="Comment"></textarea>
+          <div class="row">
+            <button class="save" onclick="saveTier2()">Save Tier 2</button>
+            <button class="clear" onclick="resetTier2()">Reset Tier 2</button>
+          </div>
+          <div class="average" id="tier2Average">Average Marks: 0</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:26px"></div>
+    <div class="card muted" id="notesCard">Notes: Charts are local-first. Firebase backup uses per-user data at <code>/users/{uid}/mockTestData</code>.</div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast-container"></div>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Firebase compat libs (so firebase.initializeApp and firebase.database() work) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+  <script>
+    // ------------------ Helper: Toast system ------------------
+    function showToast(message, type = 'info', duration = 3000) {
+      const container = document.getElementById('toast-container');
+      if (!container) return console.log(message);
+      const t = document.createElement('div');
+      t.className = 'toast ' + (type === 'success' ? 'success' : type === 'error' ? 'error' : 'info');
+      // Add icon for quick recognition
+      const icon = type === 'success' ? '✅ ' : type === 'error' ? '❌ ' : 'ℹ️ ';
+      t.innerText = icon + message;
+      container.appendChild(t);
+      // hide after duration
+      const hide = () => {
+        t.classList.add('hide');
+        setTimeout(() => t.remove(), 420);
+      };
+      setTimeout(hide, duration);
+    }
+
+    // ------------------ Your existing local data + chart code (kept intact) ------------------
+    const tier1Data = JSON.parse(localStorage.getItem('tier1Data')) || [];
+    const tier2Data = JSON.parse(localStorage.getItem('tier2Data')) || [];
+    let tier1Chart, tier2Chart;
+
+    function saveTier1() {
+      const marks = document.getElementById('tier1Marks').value;
+      const comment = document.getElementById('tier1Comment').value;
+      const date = new Date().toISOString().split('T')[0];
+      if (marks) {
+        tier1Data.push({ date, marks: parseInt(marks), comment });
+        localStorage.setItem('tier1Data', JSON.stringify(tier1Data));
+        document.getElementById('tier1Marks').value = '';
+        document.getElementById('tier1Comment').value = '';
+        renderTier1();
+        updateAvg1();
+        // Sync to Firebase if signed in
+        if (currentUser) pushLocalToFirebase();
+        showToast('Saved Tier 1 entry', 'success');
+      } else {
+        showToast('Enter marks before saving', 'error');
+      }
+    }
+
+    function saveTier2() {
+      const marks = document.getElementById('tier2Marks').value;
+      const comment = document.getElementById('tier2Comment').value;
+      const date = new Date().toISOString().split('T')[0];
+      if (marks) {
+        tier2Data.push({ date, marks: parseInt(marks), comment });
+        localStorage.setItem('tier2Data', JSON.stringify(tier2Data));
+        document.getElementById('tier2Marks').value = '';
+        document.getElementById('tier2Comment').value = '';
+        renderTier2();
+        updateAvg2();
+        // Sync to Firebase if signed in
+        if (currentUser) pushLocalToFirebase();
+        showToast('Saved Tier 2 entry', 'success');
+      } else {
+        showToast('Enter marks before saving', 'error');
+      }
+    }
+
+    function resetTier1() {
+      if (confirm("Reset Tier 1 data?")) {
+        localStorage.removeItem('tier1Data');
+        tier1Data.length = 0;
+        renderTier1();
+        updateAvg1();
+        if (currentUser) pushLocalToFirebase();
+        showToast('Tier 1 data reset', 'info');
+      }
+    }
+
+    function resetTier2() {
+      if (confirm("Reset Tier 2 data?")) {
+        localStorage.removeItem('tier2Data');
+        tier2Data.length = 0;
+        renderTier2();
+        updateAvg2();
+        if (currentUser) pushLocalToFirebase();
+        showToast('Tier 2 data reset', 'info');
+      }
+    }
+
+    function renderTier1() {
+      const ctx = document.getElementById('tier1Chart').getContext('2d');
+      if (tier1Chart) tier1Chart.destroy();
+      tier1Chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: tier1Data.map(e => new Date(e.date).toLocaleDateString()),
+          datasets: [{
+            label: 'Tier 1 Marks',
+            data: tier1Data.map(e => e.marks),
+            borderColor: 'black',
+            borderWidth: 1.5,
+            pointBackgroundColor: 'red',
+            pointRadius: 4,
+            fill: false,
+            tension: 0.2
+          }]
+        },
+        options: {
+          scales: {
+            y: { max: 200, title: { display: true, text: 'Marks' } },
+            x: { title: { display: true, text: 'Date' } }
+          },
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: ctx => `Marks: ${ctx.raw}, Comment: ${tier1Data[ctx.dataIndex].comment || ''}`
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderTier2() {
+      const ctx = document.getElementById('tier2Chart').getContext('2d');
+      if (tier2Chart) tier2Chart.destroy();
+      tier2Chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: tier2Data.map(e => new Date(e.date).toLocaleDateString()),
+          datasets: [{
+            label: 'Tier 2 Marks',
+            data: tier2Data.map(e => e.marks),
+            borderColor: 'blue',
+            borderWidth: 1.5,
+            pointBackgroundColor: 'navy',
+            pointRadius: 4,
+            fill: false,
+            tension: 0.2
+          }]
+        },
+        options: {
+          scales: {
+            y: { max: 390, title: { display: true, text: 'Marks' } },
+            x: { title: { display: true, text: 'Date' } }
+          },
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: ctx => `Marks: ${ctx.raw}, Comment: ${tier2Data[ctx.dataIndex].comment || ''}`
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateAvg1() {
+      const avg = tier1Data.reduce((sum, e) => sum + e.marks, 0) / (tier1Data.length || 1);
+      document.getElementById('tier1Average').innerText = `Average Marks: ${avg.toFixed(2)}`;
+    }
+
+    function updateAvg2() {
+      const avg = tier2Data.reduce((sum, e) => sum + e.marks, 0) / (tier2Data.length || 1);
+      document.getElementById('tier2Average').innerText = `Average Marks: ${avg.toFixed(2)}`;
+    }
+
+    function exportData() {
+      const data = {
+        tier1Data,
+        tier2Data
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "mock_test_data_backup.json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast('Export started — downloaded file', 'info');
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return showToast("No file selected", "error");
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (data.tier1Data && data.tier2Data) {
+            if (confirm("Importing will replace existing data. Continue?")) {
+              localStorage.setItem('tier1Data', JSON.stringify(data.tier1Data));
+              localStorage.setItem('tier2Data', JSON.stringify(data.tier2Data));
+              tier1Data.length = 0; tier2Data.length = 0;
+              data.tier1Data.forEach(it => tier1Data.push(it));
+              data.tier2Data.forEach(it => tier2Data.push(it));
+              renderTier1(); renderTier2(); updateAvg1(); updateAvg2();
+              if (currentUser) pushLocalToFirebase();
+              showToast("Data imported successfully", "success");
+            }
+          } else {
+            showToast("Invalid data file.", "error");
+          }
+        } catch {
+          showToast("Error parsing JSON file.", "error");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // Initialize local charts on page load
+    renderTier1();
+    renderTier2();
+    updateAvg1();
+    updateAvg2();
+
+    // ------------------ Firebase integration (Auth + Realtime DB) ------------------
+    // Your firebaseConfig (user-provided)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDyqLW6K7aMZudaGHRvxrceQDaANQE4c4Q",
+      authDomain: "local-to-firebass.firebaseapp.com",
+      databaseURL: "https://local-to-firebass-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "local-to-firebass",
+      storageBucket: "local-to-firebass.appspot.com",
+      messagingSenderId: "121890064671",
+      appId: "1:121890064671:web:9143764a66282571c1c82a"
+    };
+
+    // Initialize Firebase (compat)
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const database = firebase.database();
+
+    // UI elements
+    const signInBtn = document.getElementById('signInBtn');
+    const signUpBtn = document.getElementById('signUpBtn');
+    const signOutBtn = document.getElementById('signOutBtn');
+    const authEmail = document.getElementById('authEmail');
+    const authPassword = document.getElementById('authPassword');
+    const signedInInfo = document.getElementById('signedInInfo');
+    const backupBtn = document.getElementById('backupFirebase');
+    const restoreBtn = document.getElementById('restoreFirebase');
+    const exportBtn = document.getElementById('exportAll');
+
+    // currentUser state
+    let currentUser = null;
+    let dbListenerRef = null;
+
+    signUpBtn.onclick = async () => {
+      const email = authEmail.value.trim();
+      const pw = authPassword.value;
+      if (!email || !pw) return showToast('Provide email & password', 'error');
+      try {
+        await auth.createUserWithEmailAndPassword(email, pw);
+        showToast('Account created — signed in', 'success');
+      } catch (e) { showToast('Sign up error: ' + (e.message || e), 'error'); }
+    };
+
+    signInBtn.onclick = async () => {
+      const email = authEmail.value.trim();
+      const pw = authPassword.value;
+      if (!email || !pw) return showToast('Provide email & password', 'error');
+      try {
+        await auth.signInWithEmailAndPassword(email, pw);
+        showToast('Sign in successful', 'success');
+      } catch (e) { showToast('Sign in error: ' + (e.message || e), 'error'); }
+    };
+
+    signOutBtn.onclick = async () => {
+      try {
+        await auth.signOut();
+        showToast('Signed out', 'info');
+      } catch (e) { console.warn(e); showToast('Sign out error', 'error'); }
+    };
+
+    auth.onAuthStateChanged(async user => {
+      currentUser = user;
+      if (user) {
+        signedInInfo.innerText = `Signed in: ${user.email}`;
+        signOutBtn.style.display = 'inline-block';
+        signInBtn.style.display = 'none';
+        signUpBtn.style.display = 'none';
+        // On sign-in: sync with DB
+        await handlePostSignIn(user.uid);
+      } else {
+        signedInInfo.innerText = 'Not signed in';
+        signOutBtn.style.display = 'none';
+        signInBtn.style.display = 'inline-block';
+        signUpBtn.style.display = 'inline-block';
+        // detach any DB listener
+        if (dbListenerRef) {
+          dbListenerRef.off();
+          dbListenerRef = null;
+        }
+      }
+    });
+
+    async function handlePostSignIn(uid) {
+      // Path where we store mock test data for this user
+      const path = `users/${uid}/mockTestData`;
+      const ref = database.ref(path);
+      // read once
+      const snap = await ref.once('value');
+      const val = snap.val();
+      if (val && (val.tier1Data || val.tier2Data)) {
+        // If DB has data, replace localStorage with DB (user's cloud copy)
+        localStorage.setItem('tier1Data', JSON.stringify(val.tier1Data || []));
+        localStorage.setItem('tier2Data', JSON.stringify(val.tier2Data || []));
+        tier1Data.length = 0; tier2Data.length = 0;
+        (val.tier1Data || []).forEach(it => tier1Data.push(it));
+        (val.tier2Data || []).forEach(it => tier2Data.push(it));
+        renderTier1(); renderTier2(); updateAvg1(); updateAvg2();
+        showToast('Loaded cloud backup for this account', 'info');
+      } else {
+        // DB empty — if localStorage has data, push it to DB (automatic backup)
+        const local1 = JSON.parse(localStorage.getItem('tier1Data')) || [];
+        const local2 = JSON.parse(localStorage.getItem('tier2Data')) || [];
+        if ((local1 && local1.length) || (local2 && local2.length)) {
+          await ref.set({ tier1Data: local1, tier2Data: local2, updatedAt: Date.now() });
+          showToast('Local data backed up to cloud (first-time sync)', 'success');
+        } else {
+          showToast('No local data to back up', 'info');
+        }
+      }
+
+      // set up realtime listener to update UI if DB changes from another client
+      if (dbListenerRef) {
+        dbListenerRef.off();
+        dbListenerRef = null;
+      }
+      dbListenerRef = ref;
+      dbListenerRef.on('value', snapshot => {
+        const v = snapshot.val();
+        if (!v) return;
+        // apply db changes to localStorage and UI
+        localStorage.setItem('tier1Data', JSON.stringify(v.tier1Data || []));
+        localStorage.setItem('tier2Data', JSON.stringify(v.tier2Data || []));
+        tier1Data.length = 0; tier2Data.length = 0;
+        (v.tier1Data || []).forEach(it => tier1Data.push(it));
+        (v.tier2Data || []).forEach(it => tier2Data.push(it));
+        renderTier1(); renderTier2(); updateAvg1(); updateAvg2();
+        showToast('Cloud data updated — UI refreshed', 'info');
+      });
+    }
+
+    // Push current localStorage to Firebase (force backup)
+    async function pushLocalToFirebase() {
+      if (!currentUser) return showToast('Sign in to backup to Firebase', 'error');
+      const uid = currentUser.uid;
+      const path = `users/${uid}/mockTestData`;
+      const ref = database.ref(path);
+      const local1 = JSON.parse(localStorage.getItem('tier1Data')) || [];
+      const local2 = JSON.parse(localStorage.getItem('tier2Data')) || [];
+      try {
+        await ref.set({ tier1Data: local1, tier2Data: local2, updatedAt: Date.now() });
+        showToast('Backup to Firebase complete', 'success');
+      } catch (e) {
+        showToast('Backup failed: ' + (e.message || e), 'error');
+      }
+    }
+
+    // Restore data from Firebase into localStorage (force)
+    async function restoreFromFirebase() {
+      if (!currentUser) return showToast('Sign in to restore from Firebase', 'error');
+      const uid = currentUser.uid;
+      const path = `users/${uid}/mockTestData`;
+      const ref = database.ref(path);
+      try {
+        const snap = await ref.once('value');
+        const val = snap.val();
+        if (!val) return showToast('No backup found in Firebase for this user', 'info');
+        if (confirm('This will replace local data with the backup from Firebase. Continue?')) {
+          localStorage.setItem('tier1Data', JSON.stringify(val.tier1Data || []));
+          localStorage.setItem('tier2Data', JSON.stringify(val.tier2Data || []));
+          tier1Data.length = 0; tier2Data.length = 0;
+          (val.tier1Data || []).forEach(it => tier1Data.push(it));
+          (val.tier2Data || []).forEach(it => tier2Data.push(it));
+          renderTier1(); renderTier2(); updateAvg1(); updateAvg2();
+          showToast('Restored from Firebase', 'success');
+        }
+      } catch (e) {
+        showToast('Restore failed: ' + (e.message || e), 'error');
+      }
+    }
+
+    // Wire backup/restore buttons
+    document.getElementById('backupFirebase').onclick = pushLocalToFirebase;
+    document.getElementById('restoreFirebase').onclick = restoreFromFirebase;
+    document.getElementById('exportAll').onclick = exportData;
+
+    // Autosave every 60s (optional) — keep but non-obtrusive
+    setInterval(() => {
+      if (currentUser) pushLocalToFirebase();
+    }, 60000);
+
+    // End of Firebase integration
   </script>
 </body>
 </html>
