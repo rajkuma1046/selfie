@@ -73,10 +73,10 @@
     }
 
     header {
-      background: linear-gradient(135deg, var(--primary), orange);
+      background: linear-gradient(135deg, var(--primary), green);
       color: white;
       text-align: center;
-      padding: 20px 16px 32px;
+      padding: 20px 16px 3px;
       position: sticky;
       top: 0;
       z-index: 50;
@@ -280,6 +280,23 @@
 
     .phone-line {
       margin-top: 18px;
+       display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background-color: orange;
+      color: #333;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: 700;
+      text-decoration: none;
+      border-radius: 999px;
+      margin-top: 18px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+        background var(--transition-fast);
+      border: none;
+      cursor: pointer;
     }
 
     .phone-line a {
@@ -481,7 +498,7 @@
           <a href="tel:7999257687">7999257687</a>
         </p>
           <!-- WhatsApp quick contact -->
-  <a class="whatsapp-float"
+  <a  class="btn-map" class="whatsapp-float"
      href="https://wa.me/917999257687?text=Namaste%2C%20mujhe%20Raj%20Fruits%20se%20taaze%20fal%20chahiye."
      aria-label="WhatsApp पर संदेश भेजें">
   <img class="_afvz" alt="WhatsApp connect" src="https://static.whatsapp.net/rsrc.php/yZ/r/JvsnINJ2CZv.svg">
