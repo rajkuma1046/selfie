@@ -4,42 +4,42 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Raj Fruits - Guava & Sweet Lime Near Tata Motors Naya Amola</title>
+  <title>Raj Fruits - Fresh & Organic</title>
 
   <!-- Basic SEO -->
   <meta name="description"
-        content="Raj Fruits - Naya Amola, Tata Motors के पास स्थित फार्म और सीज़नल फल दुकान (अक्टूबर से जनवरी)। मीठे अमरूद ₹40/kg और रसीली मुसम्मी ₹50/kg। Sirsod, Karera और NH 27 के आसपास डिलीवरी/पिकअप।" />
+        content="Raj Fruits - खेत से सीधे ताज़ा अमरूद और मुसम्मी, बिना किसी हानिकारक केमिकल के। होलसेल और रिटेल दोनों सुविधाएं उपलब्ध।" />
   <meta name="keywords"
-        content="Raj Fruits, अमरूद, मुसम्मी, Naya Amola, Tata Motors, Sirsod, Karera, NH 27, farm fresh fruits" />
+        content="Raj Fruits, अमरूद, मुसम्मी, ताजे फल, ऑर्गेनिक फल, Sheopur, wholesale fruits, farm fresh" />
   <meta name="robots" content="index,follow" />
-  <link rel="canonical" href="https://rajkuma1046.github.io/selfie/fruit.html" />
 
-  <!-- Open Graph -->
+  <!-- Open Graph / Social Preview -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Raj Fruits - Fresh Guava & Sweet Lime" />
+  <meta property="og:title" content="Raj Fruits - Fresh & Organic" />
   <meta property="og:description"
-        content="अक्टूबर से जनवरी तक खेत से सीधे मीठे अमरूद और रसीली मुसम्मी। Naya Amola, Tata Motors, Sirsod, Karera के लिए बेस्ट फल। अभी WhatsApp से ऑर्डर करें।" />
-  <meta property="og:url" content="https://rajkuma1046.github.io/selfie/fruit.html" />
+        content="100% प्राकृतिक, ताज़ा और रसीले फल - सीधे हमारे खेत से। मीठे अमरूद और रसीली मुसम्मी के लिए अभी संपर्क करें।" />
   <meta property="og:image"
         content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgrwguoGphEt55F2M6X-WtBpTR4VDmEZIz14FhyHZOqBYesSHb9OWS86azhN4w_w_zZvhjZKcPtifOBqzk91KODKEJimIxIZ2SwAB2PTsoa1lumlnEGmHz6b6qto8pFTVAjgYo-9Huf3pmM7ph8YsV6734zQegDbJy1vrQROGYU3DtlyS_PzE_LE6Mrigsl/s4080/IMG20251127104524.jpg" />
+  <meta property="og:url" content="https://rajkuma1046.github.io/selfie/fruit.html" />
   <meta property="og:locale" content="hi_IN" />
 
-  <!-- Twitter -->
+  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
 
-  <!-- Favicon -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍊</text></svg>">
+  <!-- Favicon (replace with your own later) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍏</text></svg>">
 
   <style>
     :root {
-      --primary: #43a047;
-      --primary-light: #81c784;
-      --secondary: #fbc02d;
-      --bg: #f9fff7;
-      --text: #333;
-      --danger: #c62828;
-      --shadow-soft: 0 4px 10px rgba(0, 0, 0, 0.08);
-      --radius: 14px;
+      --primary: #4caf50;
+      --primary-light: #8bc34a;
+      --secondary: #2e7d32;
+      --accent: #fbc02d;
+      --bg: #f9fdf9;
+      --text-main: #333;
+      --card-radius: 12px;
+      --shadow-soft: 0 4px 8px rgba(0, 0, 0, 0.1);
+      --shadow-strong: 0 4px 10px rgba(0, 0, 0, 0.25);
       --transition-fast: 0.25s ease-in-out;
     }
 
@@ -48,212 +48,129 @@
     }
 
     body {
-      margin: 0;
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.5;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.6;
       scroll-behavior: smooth;
     }
 
-    a {
-      color: inherit;
+    /* Skip link for accessibility */
+    .skip-link {
+      position: absolute;
+      left: -999px;
+      top: 0;
+      background: #000;
+      color: #fff;
+      padding: 8px 16px;
+      z-index: 100;
+    }
+    .skip-link:focus {
+      left: 8px;
+      top: 8px;
     }
 
     header {
-      background: linear-gradient(135deg, var(--primary), var(--primary-light));
-      color: #fff;
-      padding: 12px 16px 16px;
+      background: linear-gradient(135deg, var(--primary), green);
+      color: white;
+      text-align: center;
+      padding: 20px 16px 8px;
       position: sticky;
       top: 0;
       z-index: 50;
     }
 
-    .header-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .logo-block h1 {
-      margin: 0;
-      font-size: 1.6rem;
+    header h1 {
+      margin: 8px 0;
+      font-size: 2.1rem;
       font-weight: 700;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
     }
 
-    .logo-block p {
-      margin: 2px 0 0;
-      font-size: 0.9rem;
+    header p {
+      font-size: 1.05rem;
+      margin-top: 4px;
     }
 
-    .header-cta {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 6px;
-      font-size: 0.9rem;
-    }
-
-    .header-cta a.call-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: #fff;
-      color: var(--primary);
-      font-weight: 600;
-      text-decoration: none;
-      box-shadow: var(--shadow-soft);
-      border: none;
-      cursor: pointer;
-      font-size: 0.9rem;
-      gap: 5px;
-    }
-
-    .header-cta button.order-btn-header {
-      padding: 7px 16px;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-      background: var(--secondary);
-      color: #333;
-      font-weight: 700;
-      box-shadow: var(--shadow-soft);
-      font-size: 0.9rem;
-    }
-
-    .header-cta button.order-btn-header:hover,
-    .header-cta button.order-btn-header:focus-visible {
-      filter: brightness(1.05);
-    }
-
+    /* Simple top navigation */
     nav {
-      max-width: 1100px;
-      margin: 6px auto 0;
+      margin-top: 10px;
       display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
       justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
     nav a {
       text-decoration: none;
-      color: #e8f5e9;
-      font-size: 0.8rem;
-      padding: 5px 12px;
+      padding: 6px 14px;
       border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.5);
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 0.85rem;
       backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.35);
       transition: var(--transition-fast);
     }
 
     nav a:hover,
     nav a:focus-visible {
       background: #fff;
-      color: var(--primary);
+      color: #2e7d32;
     }
 
+    /* Container */
     .container {
       max-width: 1100px;
       margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+
+    /* Generic card style */
+    .card-base {
+      background: white;
+      border-radius: var(--card-radius);
+      box-shadow: var(--shadow-soft);
+    }
+
+    /* About Section */
+    .about-section {
+      text-align: center;
+      margin-bottom: 24px;
+      padding: 20px;
+    }
+
+    .about-section h2 {
+      color: var(--secondary);
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    /* Price Section */
+    .price-section {
+      margin-bottom: 24px;
       padding: 16px;
     }
 
-    .section-card {
-      background: #fff;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-soft);
-      padding: 16px 16px 18px;
-      margin-bottom: 18px;
-    }
-
-    .section-card h2 {
-      margin: 0 0 8px;
-      color: var(--primary);
-      font-size: 1.2rem;
-    }
-
-    .badge-season {
-      display: inline-block;
-      background: #fff3cd;
-      color: #8a6d3b;
-      padding: 3px 10px;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      margin-top: 6px;
-    }
-
-    /* About + Location */
-    .about-grid {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: 14px;
-      align-items: start;
-    }
-
-    .about-list {
-      margin: 8px 0 0;
-      padding-left: 18px;
-      font-size: 0.95rem;
-    }
-
-    .about-list li {
-      margin-bottom: 4px;
-    }
-
-    .location-box {
-      background: #e8f5e9;
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-size: 0.9rem;
-    }
-
-    .location-box p {
-      margin: 4px 0;
-    }
-
-    .location-box a {
-      font-weight: 600;
-      color: var(--primary);
-      text-decoration: none;
-    }
-
-    .location-box a:hover {
-      text-decoration: underline;
-    }
-
-    /* Products / Price list */
     .price-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 12px;
-      margin-top: 10px;
+      margin-top: 8px;
     }
 
     .price-card {
       border-radius: 12px;
-      padding: 12px;
+      padding: 10px 12px;
       background: linear-gradient(135deg, #ffffff, #f1f8e9);
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 4px;
     }
 
-    .price-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .price-header h3 {
+    .price-card h3 {
       margin: 0;
       font-size: 1rem;
       color: #2e7d32;
@@ -267,104 +184,279 @@
 
     .price-card p {
       margin: 0;
-      font-size: 0.88rem;
+      font-size: 0.86rem;
     }
 
     .bulk-note {
-      margin-top: 10px;
-      font-size: 0.85rem;
+      margin-top: 8px;
+      font-size: 0.82rem;
       background: #fffde7;
-      border-left: 4px solid var(--secondary);
-      padding: 6px 10px;
+      border-left: 4px solid var(--accent);
+      padding: 5px 10px;
       border-radius: 8px;
     }
 
-    /* Reviews / Shorts */
-    .reviews-grid {
+    .price-section h2 {
+      color: var(--secondary);
+      margin-top: 0;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+
+    /* Photo Grid */
+    .gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 12px;
-      margin-top: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
     }
 
-    .review-card {
-      border-radius: 12px;
+    .card {
+      border-radius: var(--card-radius);
       overflow: hidden;
-      background: #fff;
       box-shadow: var(--shadow-soft);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+      background: white;
     }
 
-    .review-card iframe {
+    .card:hover {
+      transform: translateY(-6px) scale(1.01);
+      box-shadow: var(--shadow-strong);
+    }
+
+    .card img {
       width: 100%;
-      height: 250px;
-      border: 0;
+      height: 240px;
+      object-fit: cover;
       display: block;
     }
 
-    .review-card p {
-      padding: 8px 10px 10px;
-      margin: 0;
-      font-size: 0.88rem;
+    .card-text {
+      padding: 14px 16px 18px;
+      text-align: center;
     }
 
-    /* Call to action strip */
-    .cta-strip {
+    .card-text h3 {
+      margin: 0 0 8px;
+      color: #388e3c;
+      font-size: 1.05rem;
+    }
+
+    /* Special Feature Section (Owner Photo) */
+    .owner-msg {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
       align-items: center;
-      justify-content: space-between;
-      background: linear-gradient(90deg, #f57f17, #fbc02d);
-      color: #3e2723;
-      border-radius: 12px;
-      padding: 10px 12px;
-      margin-bottom: 70px; /* space for sticky bar on mobile */
+      background-color: #fffde7;
+      border-left: 5px solid var(--accent);
+      padding: 20px;
+      margin-bottom: 24px;
+      border-radius: 8px;
+      gap: 20px;
     }
 
-    .cta-strip strong {
-      font-size: 0.9rem;
+    .owner-img {
+      flex: 1;
+      min-width: 220px;
+      text-align: center;
     }
 
-    .cta-strip button {
+    .owner-img img {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #fff;
+      box-shadow: var(--shadow-strong);
+    }
+
+    .owner-text {
+      flex: 2;
+      padding: 10px 4px;
+      font-size: 1.02rem;
+    }
+
+    .owner-text h3 {
+      margin-top: 0;
+      color: var(--secondary);
+    }
+
+    /* Contact & Map Button */
+    .contact-section {
+      text-align: center;
+      background: var(--secondary);
+      color: white;
+      padding: 36px 20px;
+      border-radius: 14px;
+      margin-top: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .contact-section::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.18), transparent 55%);
+      pointer-events: none;
+    }
+
+    .contact-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn-map {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background-color: #ffeb3b;
+      color: #333;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: 700;
+      text-decoration: none;
       border-radius: 999px;
-      padding: 8px 16px;
+      margin-top: 18px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+        background var(--transition-fast);
       border: none;
       cursor: pointer;
-      background: #fff;
-      color: #d84315;
+    }
+
+    .btn-map:hover,
+    .btn-map:focus-visible {
+      background-color: #fdd835;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+    }
+
+    .phone-line {
+      margin-top: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background-color: orange;
+      color: #333;
+      padding: 14px 28px;
+      font-size: 1rem;
       font-weight: 700;
-      box-shadow: var(--shadow-soft);
+      text-decoration: none;
+      border-radius: 999px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+        background var(--transition-fast);
+      border: none;
+      cursor: pointer;
+    }
+
+    .phone-line a {
+      color: black;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .phone-line a:hover,
+    .phone-line a:focus-visible {
+      text-decoration: underline;
+    }
+
+    /* WhatsApp quick contact button (existing) */
+    .whatsapp-float {
+      width: 154px;
+      height: 80px;
+      border: 2px brown solid;
+      border-radius: 5%;
+      background-color: white;
+      box-shadow: var(--shadow-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: #fff;
+      font-size: 30px;
+      z-index: 60;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+      margin-top: 12px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .whatsapp-float:hover,
+    .whatsapp-float:focus-visible {
+      transform: translateY(-4px) scale(1.03);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    }
+
+    /* Back to top button */
+    .back-to-top {
+      position: fixed;
+      right: 20px;
+      bottom: 86px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      background: rgba(46, 125, 50, 0.9);
+      color: #fff;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: var(--shadow-strong);
+      z-index: 55;
+    }
+
+    .back-to-top.show {
+      display: flex;
+    }
+
+    /* Simple fade-in animation */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    footer {
+      text-align: center;
+      padding: 18px 12px 70px; /* space for sticky bar */
+      color: #777;
       font-size: 0.9rem;
     }
 
-    .cta-strip button:hover {
-      filter: brightness(1.05);
-    }
-
-    /* Sticky bottom bar (mobile first) */
+    /* Sticky bottom bar */
     .sticky-bar {
       position: fixed;
       left: 0;
       right: 0;
       bottom: 0;
-      z-index: 60;
+      z-index: 80;
       background: #ffffff;
-      box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.18);
       padding: 8px 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
+      font-size: 0.85rem;
     }
 
     .sticky-bar span {
-      font-size: 0.85rem;
       font-weight: 600;
       color: #2e7d32;
     }
 
     .sticky-bar button {
-      flex-shrink: 0;
       border-radius: 999px;
       border: none;
       cursor: pointer;
@@ -373,10 +465,10 @@
       color: #fff;
       font-weight: 700;
       font-size: 0.9rem;
+      flex-shrink: 0;
     }
 
     .sticky-bar a {
-      flex-shrink: 0;
       border-radius: 999px;
       padding: 8px 12px;
       font-size: 0.85rem;
@@ -384,10 +476,11 @@
       background: #25d366;
       color: #fff;
       font-weight: 600;
+      flex-shrink: 0;
       text-align: center;
     }
 
-    /* Modal */
+    /* Order Modal */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -441,6 +534,7 @@
     .modal-body {
       padding: 12px 14px 8px;
       overflow-y: auto;
+      font-size: 0.9rem;
     }
 
     .modal-footer {
@@ -473,13 +567,13 @@
 
     .form-group {
       margin-bottom: 10px;
-      font-size: 0.9rem;
     }
 
     .form-group label {
       display: block;
       margin-bottom: 4px;
       font-weight: 600;
+      font-size: 0.9rem;
     }
 
     .form-row {
@@ -494,10 +588,8 @@
     }
 
     input[type="text"],
-    input[type="tel"],
-    input[type="number"],
     select,
-    textarea {
+    input[type="number"] {
       width: 100%;
       padding: 7px 9px;
       font-size: 0.9rem;
@@ -510,24 +602,18 @@
     }
 
     input:focus,
-    select:focus,
-    textarea:focus {
+    select:focus {
       border-color: var(--primary);
       background: #ffffff;
     }
 
-    textarea {
-      resize: vertical;
-      min-height: 60px;
-    }
-
     .fruit-row {
       display: grid;
-      grid-template-columns: 1.3fr 1fr 1fr;
+      grid-template-columns: 1.5fr 1fr 1fr;
       gap: 6px;
       align-items: center;
       margin-bottom: 6px;
-      font-size: 0.88rem;
+      font-size: 0.86rem;
     }
 
     .qty-control {
@@ -562,30 +648,12 @@
       margin-top: 2px;
     }
 
-    .custom-price-toggle {
-      margin-top: 4px;
-      font-size: 0.8rem;
-    }
-
-    .custom-price-toggle input {
-      margin-right: 4px;
-    }
-
-    .custom-price-input {
-      margin-top: 4px;
-      display: none;
-    }
-
-    .custom-price-input.active {
-      display: block;
-    }
-
     .summary-box {
       border-radius: 10px;
       border: 1px dashed #cfd8dc;
       padding: 8px 10px;
       font-size: 0.85rem;
-      margin-top: 6px;
+      margin-top: 8px;
     }
 
     .summary-line {
@@ -606,177 +674,183 @@
 
     .error-text {
       font-size: 0.8rem;
-      color: var(--danger);
+      color: #c62828;
       margin-top: 3px;
     }
 
-    footer {
+    .cta-strip {
+      margin: 8px 0 4px;
       text-align: center;
-      padding: 18px 8px 70px; /* 70px for sticky bar */
-      font-size: 0.8rem;
-      color: #777;
+      font-size: 0.9rem;
     }
 
-    @media (min-width: 768px) {
-      header {
-        padding-bottom: 18px;
+    .cta-strip button {
+      margin-top: 6px;
+      border-radius: 999px;
+      border: none;
+      padding: 8px 16px;
+      background: var(--accent);
+      color: #3e2723;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: var(--shadow-soft);
+    }
+
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 1.9rem;
       }
-      .cta-strip {
-        margin-bottom: 24px;
+
+      .owner-msg {
+        flex-direction: column;
+        text-align: center;
       }
-      footer {
-        padding-bottom: 20px;
+
+      .owner-text {
+        padding: 8px 0 0;
+      }
+
+      .card img {
+        height: 220px;
       }
     }
 
-    @media (max-width: 720px) {
-      .about-grid {
-        grid-template-columns: 1fr;
+    @media (max-width: 480px) {
+      .btn-map {
+        width: 100%;
+      }
+
+      .back-to-top {
+        right: 14px;
+        bottom: 74px;
       }
     }
   </style>
 </head>
 <body>
+  <a href="#main" class="skip-link">Skip to main content</a>
+
   <header>
-    <div class="header-inner">
-      <div class="logo-block">
-        <h1>Raj Fruits (राज फ्रूट्स)</h1>
-        <p>खेत से सीधे – मीठे अमरूद ₹40/kg और रसीली मुसम्मी ₹50/kg</p>
-      </div>
-      <div class="header-cta">
-        <a class="call-btn" href="tel:8770767272">📞 Call: 8770767272</a>
-        <button class="order-btn-header" type="button" data-open-order>🛒 अभी ऑर्डर करें</button>
-      </div>
-    </div>
+    <h1>Raj Fruits (राज फ्रूट्स)</h1>
+    <p>100% प्राकृतिक, ताज़ा और रसीले फल - सीधे हमारे खेत से</p>
     <nav aria-label="मुख्य मेनू">
       <a href="#about">About</a>
-      <a href="#prices">Prices</a>
-      <a href="#reviews">Reviews</a>
-      <a href="#contact">Location</a>
+      <a href="#prices">Price List</a>
+      <a href="#fruits">Gallery</a>
+      <a href="#contact">Contact</a>
     </nav>
   </header>
 
-  <main class="container">
-    <!-- About + Location -->
-    <section id="about" class="section-card">
-      <h2>शुद्ध और सीज़नल फल – सीधे खेत से</h2>
-      <span class="badge-season">सीज़न: अक्टूबर से जनवरी (Oct – Jan)</span>
-      <div class="about-grid">
-        <div>
-          <p>
-            हमारे खेत पर उगाए गए अमरूद और मुसम्मी पूरी तरह प्राकृतिक तरीके से तैयार किए जाते हैं। बिना किसी हानिकारक
-            केमिकल और बेहतरीन मिठास के साथ – एक बार खाएंगे तो बार-बार याद आएंगे।
-          </p>
-          <ul class="about-list">
-            <li>लोकेशन – Tata Motors और कॉलोनी नं.1, नया अमोला के पास, NH 27 किनारे</li>
-            <li>Sirsod, Karera, नया अमोला और आसपास के गांवों के लिए बेहतरीन विकल्प</li>
-            <li>शादी, कार्यक्रम, होटल और घर के लिए होलसेल + रिटेल दोनों उपलब्ध</li>
-          </ul>
-        </div>
-        <aside class="location-box">
-          <p><strong>Google Business Profile:</strong></p>
-          <p>
-            <a href="https://maps.app.goo.gl/hMthfyH8uMGPjobc9" target="_blank" rel="noopener">
-              📍 Raj Fruits – View on Google Maps
-            </a>
-          </p>
-          <p>पास के कीवर्ड: <em>Tata Motors Naya Amola</em>, <em>Sirsod</em>, <em>Karera</em>, <em>NH 27 Fruit Shop</em></p>
-        </aside>
-      </div>
-    </section>
-
-    <!-- Prices / Products -->
-    <section id="prices" class="section-card">
-      <h2>आज की कीमतें (Today’s Price List)</h2>
-      <div class="price-grid">
-        <article class="price-card">
-          <div class="price-header">
-            <h3>मीठे अमरूद (Guava)</h3>
-            <span class="price-tag">₹40/kg</span>
-          </div>
-          <p>सफेद, दानेदार और बेहद मीठे अमरूद – सीधे बाग से।</p>
-        </article>
-
-        <article class="price-card">
-          <div class="price-header">
-            <h3>रसीली मुसम्मी (Sweet Lime)</h3>
-            <span class="price-tag">₹50/kg</span>
-          </div>
-          <p>थिक छिलका, जूस से भरपूर और प्राकृतिक मिठास से भरी मुसम्मी।</p>
-        </article>
-      </div>
-
-      <div class="bulk-note">
-        <strong>Bulk Offer:</strong> किसी भी फल के <strong>3 kg या उससे ज़्यादा</strong> लेने पर उस फल के पूरे बिल पर
-        <strong>10% की छूट</strong>। (जितना ज़्यादा, उतना बचत!)
-      </div>
-    </section>
-
-    <!-- Reviews (YouTube Shorts) -->
-    <section id="reviews" class="section-card">
-      <h2>ग्राहक क्या कहते हैं (Customer Reviews)</h2>
-      <p style="font-size:0.9rem;margin-bottom:8px;">
-        हमारे कुछ ग्राहकों के रिव्यू और छोटे वीडियो (YouTube Shorts) – आप अपने चैनल के शॉर्ट्स के लिंक यहां बदल सकते हैं।
-      </p>
-      <div class="reviews-grid">
-        <!-- Replace VIDEO_ID with your own shorts IDs -->
-        <article class="review-card">
-          <iframe
-            src="https://www.youtube.com/embed/VIDEO_ID_1"
-            title="Customer Review 1"
-            loading="lazy"
-            allowfullscreen></iframe>
-          <p>“अमरूद इतने मीठे कि शहर से भी लोग लेने आते हैं।”</p>
-        </article>
-
-        <article class="review-card">
-          <iframe
-            src="https://www.youtube.com/embed/VIDEO_ID_2"
-            title="Customer Review 2"
-            loading="lazy"
-            allowfullscreen></iframe>
-          <p>“मुसम्मी से जूस का टेस्ट बिल्कुल नैचुरल – कोई केमिकल वाली स्मेल नहीं।”</p>
-        </article>
-
-        <article class="review-card">
-          <iframe
-            src="https://www.youtube.com/embed/VIDEO_ID_3"
-            title="Farm View"
-            loading="lazy"
-            allowfullscreen></iframe>
-          <p>“खेत का सीधे वीडियो – आपको मालूम रहेगा कि फल कहां से आ रहे हैं।”</p>
-        </article>
-      </div>
-    </section>
-
-    <!-- CTA strip -->
-    <section class="cta-strip">
-      <strong>ऑनलाइन से सीधे ऑर्डर करें – WhatsApp पर डिटेल के साथ ऑर्डर मैसेज जाएगा।</strong>
-      <button type="button" data-open-order>🛒 Order / ऑर्डर बुक करें</button>
-    </section>
-
-    <!-- Contact / Location -->
-    <section id="contact" class="section-card">
-      <h2>संपर्क और लोकेशन</h2>
-      <p style="font-size:0.9rem;">
-        ताजे फल लेने के लिए सीधे खेत/दुकान पर आएं या WhatsApp से पहले से ऑर्डर बुक करें।
-      </p>
-      <p><strong>मोबाइल:</strong> <a href="tel:8770767272">8770767272</a></p>
+  <main id="main" class="container">
+    <section id="about" class="about-section card-base fade-in">
+      <h2>शुद्धता और स्वाद की गारंटी</h2>
       <p>
-        <strong>Google Maps:</strong>
-        <a href="https://maps.app.goo.gl/hMthfyH8uMGPjobc9" target="_blank" rel="noopener">
-          Raj Fruits – Tata Motors / Naya Amola के पास
-        </a>
+        हमारे खेत पर उगाए गए अमरूद और मुसम्मी पूरी तरह से प्राकृतिक वातावरण में तैयार होते हैं। हम बिना किसी
+        हानिकारक केमिकल के आपको सबसे ताजे फल उपलब्ध कराते हैं। एक बार खाएंगे, तो बार-बार मांगेंगे!
       </p>
+    </section>
+
+    <!-- Price details with discount info -->
+    <section id="prices" class="price-section card-base fade-in">
+      <h2>आज की कीमतें (Today’s Prices)</h2>
+      <div class="price-grid">
+        <div class="price-card">
+          <h3>मीठे अमरूद (Guava)</h3>
+          <span class="price-tag">₹40/kg</span>
+          <p>सफेद, दानेदार और बेहद मीठे अमरूद – सीधे खेत से।</p>
+        </div>
+        <div class="price-card">
+          <h3>रसीली मुसम्मी (Sweet Lime)</h3>
+          <span class="price-tag">₹50/kg</span>
+          <p>जूस से भरी हुई ताजी मुसम्मी।</p>
+        </div>
+      </div>
+      <div class="bulk-note">
+        <strong>Bulk Offer:</strong> 3 kg या उससे ज़्यादा किसी भी फल पर उस फल के पूरे बिल पर लगभग
+        <strong>10% छूट</strong> (ऑटोमैटिकली कैलकुलेट होगी)।
+      </div>
+      <div class="cta-strip">
+        <div>WhatsApp पर सीधे ऑर्डर भेजने के लिए नीचे वाले बटन पर क्लिक करें।</div>
+        <button type="button" data-open-order>🛒 ऑर्डर बुक करें</button>
+      </div>
+    </section>
+
+    <section class="owner-msg fade-in" aria-label="Owner message">
+      <div class="owner-img">
+        <img
+          src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhrH59RYuVcIRqvjY47lgxr27F1LVlTb4mK1PHYQA3-yL6k-uiToVFYSmWCUC-SHrU5fhKPCRlU2NTRt1_lv_muGAUvlu5Ksd3_LgyAiWswn0OC4AcVAilNcQ_c4nSkkUQ2uKW82byYyONIF7QdAdTYLC5N2c1w6ezRUP8Pg7C-5XNSbXEAwc8EZuGEBxY_/s1821/Screenshot_2025-11-27-11-15-31-43_99c04817c0de5652397fc8b56c3b3817.jpg"
+          alt="Owner of Raj Fruits" loading="lazy" decoding="async" />
+      </div>
+      <div class="owner-text">
+        <h3>खेत से सीधा संपर्क</h3>
+        <p>
+          "नमस्कार! मैं आपको भरोसा दिलाता हूं कि राज फ्रूट्स पर आपको जो भी फल मिलेगा, वह डाल का पका हुआ और मिठास से
+          भरा होगा। हमारे यहां क्वालिटी से कोई समझौता नहीं किया जाता।"
+        </p>
+      </div>
+    </section>
+
+    <section id="fruits" class="gallery" aria-label="Fruit photos">
+      <article class="card fade-in">
+        <img
+          src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgrwguoGphEt55F2M6X-WtBpTR4VDmEZIz14FhyHZOqBYesSHb9OWS86azhN4w_w_zZvhjZKcPtifOBqzk91KODKEJimIxIZ2SwAB2PTsoa1lumlnEGmHz6b6qto8pFTVAjgYo-9Huf3pmM7ph8YsV6734zQegDbJy1vrQROGYU3DtlyS_PzE_LE6Mrigsl/s4080/IMG20251127104524.jpg"
+          alt="मीठे अमरूद की प्लेट" loading="lazy" decoding="async" />
+        <div class="card-text">
+          <h3>मीठे अमरूद (Guava)</h3>
+          <p>सफेद, दानेदार और बेहद मीठे अमरूद।</p>
+        </div>
+      </article>
+
+      <article class="card fade-in">
+        <img
+          src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgTYJEzL3GpSVx3aURcmYkLMrQb32lAsco8we9UYHkWn7Pp0jofDLf3ty23BqNZlHbBRuI8rShnQlJCZBrLfDeN_K_RAYZPuK4mIHxjY0_cZzkR6UT-Y81pzaqtWEp6BVAbqT79OvqfXIEX8HONhaZw2MOzWBMFvT97-0MablC_LOh27ZBnJhC0upP-cn1n/s320/IMG20251127103725.jpg"
+          alt="पेड़ पर लगी ताज़ा मुसम्मी" loading="lazy" decoding="async" />
+        <div class="card-text">
+          <h3 style="color: orange;">रसीली मुसम्मी (Sweet Lime)</h3>
+          <p>जूस से भरी हुई ताजी मुसम्मी।</p>
+        </div>
+      </article>
+
+      <article class="card fade-in">
+        <img
+          src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEib7u8orNIb21bf6d33YJhnDPl8roTX7VQiXx4IdBBYHRydPIIsisUzoU5wE0Du5ScHuIIjwz20j3Ele4xQBr7h2l8rFT_8aK4yb9HdW3F_pz4vH9aR9JyNLoiAzePUwW3Jked005GblfhLQJO7hQ2fCmNJpaXb-JWzvE-kknvt5zvD-TNhHjOg2l_bcnjq/s4080/IMG20251127103636.jpg"
+          alt="होलसेल के लिए पैक किए गए फल" loading="lazy" decoding="async" />
+        <div class="card-text">
+          <h3>होलसेल और रिटेल</h3>
+          <p>शादी, पार्टी या घर के लिए ताजे फल उपलब्ध हैं।</p>
+        </div>
+      </article>
+    </section>
+
+    <section id="contact" class="contact-section fade-in">
+      <div class="contact-inner">
+        <h2>हमसे संपर्क करें</h2>
+        <p>
+          ताजे फलों का ऑर्डर देने या खेत पर विजिट करने के लिए नीचे दिए गए बटन पर क्लिक करें।
+        </p>
+
+        <a href="https://maps.app.goo.gl/CnYp5KQf2Cx3WnjE9"
+           class="btn-map"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="Google Maps पर Raj Fruits की लोकेशन खोलें">
+          📍 Google Maps पर लोकेशन देखें
+        </a>
+
+        <p class="phone-line">
+          📞 मोबाइल:
+          <a href="tel:7999257687">7999257687</a>
+        </p>
+
+        <!-- WhatsApp quick contact -->
+        <a class="whatsapp-float"
+           href="https://wa.me/917999257687?text=Namaste%2C%20mujhe%20Raj%20Fruits%20se%20taaze%20fal%20chahiye."
+           aria-label="WhatsApp पर संदेश भेजें">
+          <img alt="WhatsApp connect" src="https://static.whatsapp.net/rsrc.php/yZ/r/JvsnINJ2CZv.svg">
+        </a>
+      </div>
     </section>
   </main>
-
-  <!-- Sticky bottom bar (mobile) -->
-  <div class="sticky-bar">
-    <span>सीधे WhatsApp पर खेत से ऑर्डर करें</span>
-    <button type="button" data-open-order>🛒 Order</button>
-    <a href="https://wa.me/918770767272" target="_blank" rel="noopener">💬 WhatsApp Chat</a>
-  </div>
 
   <!-- Order Modal -->
   <div class="modal-backdrop" id="orderModal">
@@ -787,17 +861,11 @@
       </div>
       <div class="modal-body">
         <form id="orderForm" autocomplete="on">
-          <!-- Customer info -->
           <div class="form-row">
             <div class="form-group">
               <label for="customerName">नाम *</label>
               <input type="text" id="customerName" name="customerName" required />
               <div class="error-text" data-error-for="customerName"></div>
-            </div>
-            <div class="form-group">
-              <label for="customerPhone">मोबाइल *</label>
-              <input type="tel" id="customerPhone" name="customerPhone" required placeholder="10 digit" />
-              <div class="error-text" data-error-for="customerPhone"></div>
             </div>
           </div>
 
@@ -810,7 +878,7 @@
                 <option value="Sirsod">Sirsod</option>
                 <option value="Karera">Karera</option>
                 <option value="NH 27 के पास">NH 27 के पास</option>
-                <option value="अन्य (नीचे लिखें)">अन्य (नीचे लिखें)</option>
+                <option value="अन्य">अन्य</option>
               </select>
               <div class="error-text" data-error-for="customerArea"></div>
             </div>
@@ -819,42 +887,21 @@
               <select id="orderType" name="orderType" required>
                 <option value="">चुनें</option>
                 <option value="Pickup (स्वयं लेना)">Pickup (स्वयं लेना)</option>
-                <option value="Delivery (घर तक)">Delivery (घर तक)</option>
+                <option value="Delivery (यदि संभव हो)">Delivery (यदि संभव हो)</option>
               </select>
               <div class="error-text" data-error-for="orderType"></div>
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="exactAddress">यदि अन्य/डिलीवरी हो तो पूरा पता</label>
-            <textarea id="exactAddress" name="exactAddress" placeholder="पूरा पता / लैंडमार्क लिखें"></textarea>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="preferredTime">पसंदीदा समय</label>
-              <select id="preferredTime" name="preferredTime">
-                <option value="कोई भी समय चलेगा">कोई भी समय चलेगा</option>
-                <option value="सुबह (7am - 11am)">सुबह (7am - 11am)</option>
-                <option value="दोपहर (11am - 3pm)">दोपहर (11am - 3pm)</option>
-                <option value="शाम (3pm - 7pm)">शाम (3pm - 7pm)</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="extraNote">कोई खास नोट</label>
-              <input type="text" id="extraNote" name="extraNote" placeholder="पका हुआ / कच्चा / mix?" />
-            </div>
-          </div>
-
           <hr style="margin:10px 0;" />
 
-          <!-- Fruit selection -->
           <div class="form-group">
             <label>फल की मात्रा (kg में)</label>
+
             <div class="fruit-row">
               <div>
                 <strong>मीठे अमरूद (₹40/kg)</strong>
-                <div class="line-note">3kg से ऊपर पूरे अमरूद बिल पर 10% छूट।</div>
+                <div class="line-note">3kg से ऊपर पूरे अमरूद बिल पर लगभग 10% छूट।</div>
               </div>
               <div>
                 <div class="qty-control">
@@ -863,24 +910,13 @@
                   <button type="button" data-qty-plus="guava">+</button>
                 </div>
               </div>
-              <div>
-                <div class="custom-price-toggle">
-                  <label>
-                    <input type="checkbox" data-custom-toggle="guava" />
-                    अपना rate बताना है?
-                  </label>
-                </div>
-                <div class="custom-price-input" id="customPriceGuavaBox">
-                  <input type="number" id="customPriceGuava" min="1" step="1"
-                         placeholder="आपका rate (₹/kg)" />
-                </div>
-              </div>
+              <div style="font-size:0.8rem;">Only shop rate used</div>
             </div>
 
             <div class="fruit-row">
               <div>
                 <strong>रसीली मुसम्मी (₹50/kg)</strong>
-                <div class="line-note">3kg से ऊपर पूरे मुसम्मी बिल पर 10% छूट।</div>
+                <div class="line-note">3kg से ऊपर पूरे मुसम्मी बिल पर लगभग 10% छूट।</div>
               </div>
               <div>
                 <div class="qty-control">
@@ -889,23 +925,12 @@
                   <button type="button" data-qty-plus="sweetLime">+</button>
                 </div>
               </div>
-              <div>
-                <div class="custom-price-toggle">
-                  <label>
-                    <input type="checkbox" data-custom-toggle="sweetLime" />
-                    अपना rate बताना है?
-                  </label>
-                </div>
-                <div class="custom-price-input" id="customPriceSweetLimeBox">
-                  <input type="number" id="customPriceSweetLime" min="1" step="1"
-                         placeholder="आपका rate (₹/kg)" />
-                </div>
-              </div>
+              <div style="font-size:0.8rem;">Only shop rate used</div>
             </div>
+
             <div class="error-text" data-error-for="quantities"></div>
           </div>
 
-          <!-- Summary -->
           <div class="summary-box" id="orderSummary">
             <div class="summary-line">
               <span>Subtotal</span>
@@ -916,11 +941,11 @@
               <span id="summaryDiscount">- ₹0</span>
             </div>
             <div class="summary-line total">
-              <span>Total Payable</span>
+              <span>Total Approx</span>
               <span id="summaryTotal">₹0</span>
             </div>
             <div style="font-size:0.78rem;margin-top:3px;color:#666;">
-              Final rate और कन्फ़र्मेशन फोन/WhatsApp पर बात करके तय होगा।
+              Final rate और exact amount दुकान पर बात करके तय होगा।
             </div>
           </div>
         </form>
@@ -932,19 +957,28 @@
     </div>
   </div>
 
+  <!-- Sticky bar -->
+  <div class="sticky-bar">
+    <span>खेत से सीधे – अभी WhatsApp पर ऑर्डर करें</span>
+    <button type="button" data-open-order>🛒 Order</button>
+    <a href="https://wa.me/917999257687" target="_blank" rel="noopener">💬 सिर्फ चैट</a>
+  </div>
+
+  <button class="back-to-top" aria-label="ऊपर जाएं">↑</button>
+
   <footer>
-    © 2024 Raj Fruits Farm – Naya Amola, Tata Motors, NH 27 | Local Fresh Fruits for Sirsod, Karera & nearby.
+    <p>&copy; 2025-26 Raj Fruits Farm</p>
   </footer>
 
-  <!-- LocalBusiness Schema -->
+  <!-- Local Business Schema -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
+    "@type": "FoodEstablishment",
     "name": "Raj Fruits",
-    "description": "Seasonal guava and sweet lime farm & fruit shop near Tata Motors, Naya Amola, NH 27. Guava at ₹40/kg and sweet lime at ₹50/kg.",
+    "description": "Farm-fresh guava and sweet lime directly from the field without harmful chemicals.",
     "url": "https://rajkuma1046.github.io/selfie/fruit.html",
-    "telephone": "+91-8770767272",
+    "telephone": "+91-7999257687",
     "image": [
       "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgrwguoGphEt55F2M6X-WtBpTR4VDmEZIz14FhyHZOqBYesSHb9OWS86azhN4w_w_zZvhjZKcPtifOBqzk91KODKEJimIxIZ2SwAB2PTsoa1lumlnEGmHz6b6qto8pFTVAjgYo-9Huf3pmM7ph8YsV6734zQegDbJy1vrQROGYU3DtlyS_PzE_LE6Mrigsl/s4080/IMG20251127104524.jpg"
     ],
@@ -952,37 +986,64 @@
       "@type": "PostalAddress",
       "addressCountry": "IN"
     },
-    "geo": {
-      "@type": "GeoCoordinates",
-      "latitude": "",
-      "longitude": ""
-    },
-    "areaServed": [
-      "Naya Amola",
-      "Sirsod",
-      "Karera",
-      "NH 27"
-    ],
+    "servesCuisine": "Fruits",
+    "priceRange": "₹40-₹50",
     "sameAs": [
-      "https://maps.app.goo.gl/hMthfyH8uMGPjobc9"
+      "https://maps.app.goo.gl/CnYp5KQf2Cx3WnjE9"
     ]
   }
   </script>
 
   <script>
+    // Intersection Observer to reveal fade-in elements
     (function () {
-      const PRICES = {
-        guava: 40,
-        sweetLime: 50
-      };
+      const elements = document.querySelectorAll(".fade-in");
+      if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("visible");
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.1 }
+        );
+        elements.forEach((el) => observer.observe(el));
+      } else {
+        elements.forEach((el) => el.classList.add("visible"));
+      }
+    })();
+
+    // Back to top button behaviour
+    (function () {
+      const btn = document.querySelector(".back-to-top");
+      window.addEventListener("scroll", () => {
+        if (window.scrollY > 250) {
+          btn.classList.add("show");
+        } else {
+          btn.classList.remove("show");
+        }
+      });
+      btn.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    })();
+
+    // Order popup + WhatsApp integration
+    (function () {
+      const PRICES = { guava: 40, sweetLime: 50 };
       const DISCOUNT_THRESHOLD_KG = 3;
       const DISCOUNT_RATE = 0.10;
-      const WHATSAPP_NUMBER = "918770767272"; // 91 + 8770767272
+      const WHATSAPP_NUMBER = "917999257687";
 
       const modalBackdrop = document.getElementById("orderModal");
       const openBtns = document.querySelectorAll("[data-open-order]");
       const closeBtns = document.querySelectorAll("[data-close-order]");
-      const form = document.getElementById("orderForm");
+      const customerNameInput = document.getElementById("customerName");
+      const customerAreaInput = document.getElementById("customerArea");
+      const orderTypeInput = document.getElementById("orderType");
 
       const qtyGuava = document.getElementById("qtyGuava");
       const qtySweetLime = document.getElementById("qtySweetLime");
@@ -991,22 +1052,11 @@
       const summaryTotal = document.getElementById("summaryTotal");
       const sendWhatsappBtn = document.getElementById("sendWhatsappBtn");
 
-      const customerNameInput = document.getElementById("customerName");
-      const customerPhoneInput = document.getElementById("customerPhone");
-      const customerAreaInput = document.getElementById("customerArea");
-      const orderTypeInput = document.getElementById("orderType");
-
-      // restore name & phone from localStorage
-      const savedName = localStorage.getItem("rajfruits_name");
-      const savedPhone = localStorage.getItem("rajfruits_phone");
-      if (savedName) customerNameInput.value = savedName;
-      if (savedPhone) customerPhoneInput.value = savedPhone;
-
-      // Modal open/close
+      // Open modal
       openBtns.forEach((btn) =>
         btn.addEventListener("click", () => {
           modalBackdrop.classList.add("active");
-          setTimeout(() => customerNameInput.focus(), 50);
+          setTimeout(() => customerNameInput.focus(), 60);
           updateSummary();
         })
       );
@@ -1027,7 +1077,7 @@
         if (e.key === "Escape") closeModal();
       });
 
-      // Quantity buttons
+      // Qty controls
       document.querySelectorAll("[data-qty-plus]").forEach((btn) => {
         btn.addEventListener("click", () => {
           const type = btn.getAttribute("data-qty-plus");
@@ -1054,22 +1104,6 @@
       qtyGuava.addEventListener("input", updateSummary);
       qtySweetLime.addEventListener("input", updateSummary);
 
-      // Custom price toggles
-      document.querySelectorAll("[data-custom-toggle]").forEach((checkbox) => {
-        checkbox.addEventListener("change", () => {
-          const type = checkbox.getAttribute("data-custom-toggle");
-          const box =
-            type === "guava"
-              ? document.getElementById("customPriceGuavaBox")
-              : document.getElementById("customPriceSweetLimeBox");
-          if (checkbox.checked) {
-            box.classList.add("active");
-          } else {
-            box.classList.remove("active");
-          }
-        });
-      });
-
       function parseQty(input) {
         const v = parseFloat(input.value);
         return isNaN(v) || v < 0 ? 0 : v;
@@ -1087,12 +1121,8 @@
         const subSweet = qSweet * PRICES.sweetLime;
 
         let discount = 0;
-        if (qGuava >= DISCOUNT_THRESHOLD_KG) {
-          discount += subGuava * DISCOUNT_RATE;
-        }
-        if (qSweet >= DISCOUNT_THRESHOLD_KG) {
-          discount += subSweet * DISCOUNT_RATE;
-        }
+        if (qGuava >= DISCOUNT_THRESHOLD_KG) discount += subGuava * DISCOUNT_RATE;
+        if (qSweet >= DISCOUNT_THRESHOLD_KG) discount += subSweet * DISCOUNT_RATE;
 
         const subtotal = subGuava + subSweet;
         const total = subtotal - discount;
@@ -1102,18 +1132,13 @@
         summaryTotal.textContent = money(total > 0 ? total : 0);
       }
 
-      // Validation helper
       function setError(fieldName, msg) {
-        const el = document.querySelector(
-          '[data-error-for="' + fieldName + '"]'
-        );
+        const el = document.querySelector('[data-error-for="' + fieldName + '"]');
         if (el) el.textContent = msg || "";
       }
 
       function clearErrors() {
-        document
-          .querySelectorAll("[data-error-for]")
-          .forEach((el) => (el.textContent = ""));
+        document.querySelectorAll("[data-error-for]").forEach((el) => (el.textContent = ""));
       }
 
       function validateForm() {
@@ -1121,7 +1146,6 @@
         let ok = true;
 
         const name = customerNameInput.value.trim();
-        const phone = customerPhoneInput.value.trim();
         const area = customerAreaInput.value;
         const orderType = orderTypeInput.value;
         const qGuava = parseQty(qtyGuava);
@@ -1131,66 +1155,30 @@
           setError("customerName", "नाम लिखें");
           ok = false;
         }
-
-        if (!phone || !/^\d{10}$/.test(phone)) {
-          setError("customerPhone", "वैध 10 digit मोबाइल लिखें");
-          ok = false;
-        }
-
         if (!area) {
           setError("customerArea", "एरिया चुनें");
           ok = false;
         }
-
         if (!orderType) {
           setError("orderType", "Pickup या Delivery चुनें");
           ok = false;
         }
-
         if (qGuava <= 0 && qSweet <= 0) {
           setError("quantities", "कम से कम किसी एक फल की मात्रा डालें");
           ok = false;
         }
-
         return ok;
       }
 
-      // Send to WhatsApp
       sendWhatsappBtn.addEventListener("click", () => {
-        if (!validateForm()) {
-          return;
-        }
+        if (!validateForm()) return;
 
         const name = customerNameInput.value.trim();
-        const phone = customerPhoneInput.value.trim();
         const area = customerAreaInput.value;
         const orderType = orderTypeInput.value;
-        const address = document.getElementById("exactAddress").value.trim();
-        const preferredTime = document.getElementById("preferredTime").value;
-        const note = document.getElementById("extraNote").value.trim();
-
         const qGuava = parseQty(qtyGuava);
         const qSweet = parseQty(qtySweetLime);
 
-        const customGuavaOn = document.querySelector(
-          "[data-custom-toggle='guava']"
-        ).checked;
-        const customSweetOn = document.querySelector(
-          "[data-custom-toggle='sweetLime']"
-        ).checked;
-
-        const customGuava =
-          customGuavaOn &&
-          document.getElementById("customPriceGuava").value.trim();
-        const customSweet =
-          customSweetOn &&
-          document.getElementById("customPriceSweetLime").value.trim();
-
-        // Save name + phone
-        localStorage.setItem("rajfruits_name", name);
-        localStorage.setItem("rajfruits_phone", phone);
-
-        // Compute totals again for message
         const subGuava = qGuava * PRICES.guava;
         const subSweet = qSweet * PRICES.sweetLime;
         let discount = 0;
@@ -1200,13 +1188,9 @@
         const total = subtotal - discount;
 
         let message = "New online order - Raj Fruits%0a";
-        message += "--------------------------------%0a";
+        message += "----------------------------%0a";
         message += "Name: " + name + "%0a";
-        message += "Customer Mobile: " + phone + "%0a";
         message += "Area: " + area + "%0a";
-        if (address) {
-          message += "Address Detail: " + address + "%0a";
-        }
         message += "Order Type: " + orderType + "%0a%0a";
         message += "Items:%0a";
 
@@ -1214,9 +1198,7 @@
           message +=
             "- Guava: " +
             qGuava +
-            " kg @ ₹" +
-            PRICES.guava +
-            "/kg = ₹" +
+            " kg @ ₹40/kg = ₹" +
             Math.round(subGuava) +
             "%0a";
         }
@@ -1224,38 +1206,19 @@
           message +=
             "- Sweet Lime: " +
             qSweet +
-            " kg @ ₹" +
-            PRICES.sweetLime +
-            "/kg = ₹" +
+            " kg @ ₹50/kg = ₹" +
             Math.round(subSweet) +
             "%0a";
         }
 
-        if (customGuava || customSweet) {
-          message += "%0aCustomer expected price:%0a";
-          if (customGuava) {
-            message += "- Guava: ₹" + customGuava + "/kg%0a";
-          }
-          if (customSweet) {
-            message += "- Sweet Lime: ₹" + customSweet + "/kg%0a";
-          }
-        }
-
         message += "%0aSubtotal: ₹" + Math.round(subtotal) + "%0a";
-        message += "Bulk Discount: ₹" + Math.round(discount) + "%0a";
-        message += "Total (approx): ₹" + Math.round(total) + "%0a%0a";
-        message += "Preferred time: " + preferredTime + "%0a";
-        if (note) {
-          message += "Customer note: " + note + "%0a";
-        }
-        message += "--------------------------------%0a";
-        message +=
-          "Note: Final rate & delivery detail phone/WhatsApp पर बात करके तय करें।";
+        message += "Bulk Discount (approx): ₹" + Math.round(discount) + "%0a";
+        message += "Total (approx): ₹" + Math.round(total) + "%0a";
+        message += "----------------------------%0a";
+        message += "Note: Final rate दुकान पर/कॉल पर फाइनल होगा।";
 
-        const url =
-          "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + message;
+        const url = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + message;
         window.open(url, "_blank");
-
         closeModal();
       });
     })();
