@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raj Fruits - ताज़े देसी फल</title>
+<style>
+  /* General Styles */
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f2fff2;
+    color: #222;
+    line-height: 1.7;
+    font-size: 18px;       /* थोड़ा बड़ा फ़ॉन्ट */
+  }
+
+  header {
+    background: linear-gradient(135deg, #2e7d32, #81c784);
+    color: white;
+    text-align: center;
+    padding: 30px 15px;
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: 2.1em;
+    font-weight: 700;
+  }
+
+  header p {
+    margin-top: 8px;
+    font-size: 1.1em;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  /* Simple highlight line for rural users to focus */
+  .info-strip {
+    background: #fff8e1;
+    border: 1px dashed #f9a825;
+    padding: 10px 14px;
+    margin: 10px 0 20px 0;
+    border-radius: 6px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  /* About Section */
+  .about-section {
+    text-align: left;
+    margin-bottom: 24px;
+    padding: 16px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+  }
+  .about-section h2 {
+    color: #2e7d32;
+    margin-top: 0;
+    font-size: 1.4em;
+  }
+  .about-section ul {
+    padding-left: 20px;
+    margin: 10px 0 0 0;
+  }
+  .about-section li {
+    margin-bottom: 6px;
+  }
+
+  /* Owner Section */
+  .owner-msg {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    background-color: #fffde7;
+    border-left: 5px solid #fbc02d;
+    padding: 18px;
+    margin-bottom: 26px;
+    border-radius: 8px;
+  }
+  .owner-img {
+    flex: 1;
+    min-width: 220px;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .owner-img img {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+  .owner-text {
+    flex: 2;
+    padding: 0 10px;
+    font-size: 1em;
+  }
+  .owner-text h3 {
+    margin-top: 0;
+    color: #e65100;
+  }
+
+  /* Gallery */
+  .section-title {
+    font-size: 1.3em;
+    color: #2e7d32;
+    margin: 10px 0;
+    font-weight: 700;
+  }
+
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 26px;
+  }
+
+  .card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+  }
+
+  .card:hover {
+    transform: translateY(-3px);
+  }
+
+  .card img {
+    width: 100%;
+    height: 230px;
+    object-fit: cover;
+  }
+
+  .card-text {
+    padding: 10px 12px 14px;
+    text-align: left;
+  }
+
+  .card-text h3 {
+    margin: 0 0 6px;
+    color: #388e3c;
+    font-size: 1.1em;
+  }
+
+  .card-text p {
+    margin: 0;
+    font-size: 0.98em;
+  }
+
+  /* Contact Section */
+  .contact-section {
+    text-align: center;
+    background: #2e7d32;
+    color: white;
+    padding: 26px 14px 32px;
+    border-radius: 10px;
+    margin-bottom: 18px;
+  }
+  .contact-section h2 {
+    margin-top: 0;
+    font-size: 1.4em;
+  }
+
+  .btn-row {
+    margin-top: 12px;
+  }
+
+  .btn-main {
+    display: inline-block;
+    padding: 12px 20px;
+    margin: 6px;
+    border-radius: 40px;
+    font-size: 1.02em;
+    font-weight: 700;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+  }
+
+  .btn-call {
+    background: #ffeb3b;
+    color: #212121;
+  }
+
+  .btn-wa {
+    background: #e0f2f1;
+    color: #004d40;
+  }
+
+  .btn-map {
+    background-color: #ffe082;
+    color: #3e2723;
+  }
+
+  .contact-section p {
+    margin: 8px 0 0;
+    font-size: 0.98em;
+  }
+
+  footer {
+    text-align: center;
+    padding: 14px;
+    color: #777;
+    font-size: 0.9em;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    header h1 { font-size: 1.8em; }
+    body { font-size: 17px; }
+    .owner-msg { flex-direction: column; text-align: center; }
+    .owner-text { padding: 10px 0 0; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Raj Fruits (राज फ्रूट्स)</h1>
+  <p>खेत से सीधे आपके घर तक – देसी, ताज़े और रसीले फल</p>
+</header>
+
+<div class="container">
+
+  <div class="info-strip">
+    📢 ऑर्डर करने के लिए सीधे कॉल या व्हाट्सऐप करें। रेट और उपलब्धता फोन पर बता दी जाएगी।
+  </div>
+
+  <!-- About -->
+  <section class="about-section">
+    <h2>हमारे यहाँ क्या मिलता है?</h2>
+    <p>हम अपने खेत पर अमरूद और मुसम्मी को देसी तरीके से उगाते हैं। कोशिश रहती है कि:</p>
+    <ul>
+      <li>पेड़ पर ही पकने दिए गए फल आपके तक पहुँचें।</li>
+      <li>फलों में ज़्यादा मिठास और खुशबू हो।</li>
+      <li>बिना ज़रूरत के केमिकल का उपयोग न किया जाए।</li>
+      <li>ग्राहक को साफ़–सुथरे और चुने हुए फल दिए जाएँ।</li>
+    </ul>
+    <p style="margin-top:8px;">
+      शादी–समारोह, छोटी पार्टी या रोज़ाना घर के लिए फल चाहिए तो पहले फोन करें, फल की उपलब्धता व रेट की जानकारी दे दी जाएगी।
+    </p>
+  </section>
+
+  <!-- Owner Message -->
+  <section class="owner-msg">
+    <div class="owner-img">
+      <!-- आपकी फोटो -->
+      <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhrH59RYuVcIRqvjY47lgxr27F1LVlTb4mK1PHYQA3-yL6k-uiToVFYSmWCUC-SHrU5fhKPCRlU2NTRt1_lv_muGAUvlu5Ksd3_LgyAiWswn0OC4AcVAilNcQ_c4nSkkUQ2uKW82byYyONIF7QdAdTYLC5N2c1w6ezRUP8Pg7C-5XNSbXEAwc8EZuGEBxY_/s1821/Screenshot_2025-11-27-11-15-31-43_99c04817c0de5652397fc8b56c3b3817.jpg" alt="Raj Fruits मालिक">
+    </div>
+    <div class="owner-text">
+      <h3>खेत के मालिक का संदेश</h3>
+      <p>
+        "नमस्कार! मैं यह वादा करता हूँ कि Raj Fruits पर आपको जो भी फल मिलेगा,
+        वह डाल का पका हुआ और जितना हो सके उतना स्वाभाविक स्वाद वाला होगा।
+        हमारा मकसद है कि गाँव और कस्बे के लोग भी अच्छे और साफ़ फल उचित दाम पर पा सकें।
+      </p>
+      <p>
+        अगर आपको मोबाइल चलाना कम आता है तो चिंता मत करें – बस साधारण कॉल करें,
+        बाकी जानकारी हम धीरे–धीरे समझा देंगे।"
+      </p>
+    </div>
+  </section>
+
+  <!-- Fruits Section Title -->
+  <h2 class="section-title">हमारे मुख्य फल</h2>
+
+  <!-- Gallery -->
+  <section class="gallery">
+    <div class="card">
+      <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgrwguoGphEt55F2M6X-WtBpTR4VDmEZIz14FhyHZOqBYesSHb9OWS86azhN4w_w_zZvhjZKcPtifOBqzk91KODKEJimIxIZ2SwAB2PTsoa1lumlnEGmHz6b6qto8pFTVAjgYo-9Huf3pmM7ph8YsV6734zQegDbJy1vrQROGYU3DtlyS_PzE_LE6Mrigsl/s4080/IMG20251127104524.jpg" alt="मीठे अमरूद">
+      <div class="card-text">
+        <h3>मीठे अमरूद (Guava)</h3>
+        <p>सफेद गूदा, हल्के दानेदार और अच्छे स्वाद वाले अमरूद – खाने और सलाद दोनों के लिए बढ़िया।</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgTYJEzL3GpSVx3aURcmYkLMrQb32lAsco8we9UYHkWn7Pp0jofDLf3ty23BqNZlHbBRuI8rShnQlJCZBrLfDeN_K_RAYZPuK4mIHxjY0_cZzkR6UT-Y81pzaqtWEp6BVAbqT79OvqfXIEX8HONhaZw2MOzWBMFvT97-0MablC_LOh27ZBnJhC0upP-cn1n/s320/IMG20251127103725.jpg" alt="रसीली मुसम्मी">
+      <div class="card-text">
+        <h3>रसीली मुसम्मी (Sweet Lime)</h3>
+        <p>जूस से भरी मुसम्मी, घर के जूस, ठंडाई और मेहमानों के लिए बढ़िया विकल्प।</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEib7u8orNIb21bf6d33YJhnDPl8roTX7VQiXx4IdBBYHRydPIIsisUzoU5wE0Du5ScHuIIjwz20j3Ele4xQBr7h2l8rFT_8aK4yb9HdW3F_pz4vH9aR9JyNLoiAzePUwW3Jked005GblfhLQJO7hQ2fCmNJpaXb-JWzvE-kknvt5zvD-TNhHjOg2l_bcnjq/s4080/IMG20251127103636.jpg" alt="फल की टोकरी">
+      <div class="card-text">
+        <h3>थोक और रिटेल दोनों</h3>
+        <p>शादी, भंडारा, दशगात्र, जन्मदिन या रोज़मर्रा के लिए – ज़रूरत के हिसाब से फल उपलब्ध कराने की कोशिश की जाती है।</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How to order / Contact -->
+  <section class="contact-section">
+    <h2>कैसे ऑर्डर करें?</h2>
+    <p>नीचे दिए गए बटन से सीधे फोन या व्हाट्सऐप करें:</p>
+
+    <div class="btn-row">
+      <a href="tel:8770767272" class="btn-main btn-call">📞 अभी कॉल करें (8770767272)</a>
+    </div>
+
+    <div class="btn-row">
+      <a href="https://wa.me/918770767272" class="btn-main btn-wa">💬 WhatsApp पर संदेश भेजें</a>
+    </div>
+
+    <div class="btn-row">
+      <a href="https://maps.app.goo.gl/CnYp5KQf2Cx3WnjE9" class="btn-main btn-map">📍 Google Maps पर खेत/दुकान देखें</a>
+    </div>
+
+    <p>कॉल करते समय अपना नाम, गाँव और कितने किलो फल चाहिए – इतनी जानकारी बता दें।</p>
+  </section>
+</div>
+
+<footer>
+  &copy; 2025 Raj Fruits Farm – देसी स्वाद, खेत से सीधे आपके लिए
+</footer>
+
+</body>
+</html>
